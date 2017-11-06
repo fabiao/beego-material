@@ -1,0 +1,26 @@
+{
+  "en-US": {
+    "validation.field_required": "Field '%s' is required.",
+    "validation.field_invalid": "Field '%s' has an invalid value.",
+    "validation.field_invalid_id": "Field '%s' contains an invalid object id value.",
+    "validation.field_minlen": "Field '%s' must be at least %v characters long.",
+    "validation.field_maxlen": "Field '%s' can be maximum %v characters long.",
+    "validation.entry_exists": "%s already exists for value '%v'.",
+    "validation.field_not_exclusive": "Only one of both fields can be set: '%s'' or '%s'.",
+    "validation.field_required_exclusive": "Field '%s' or '%s' required.",
+    "validation.field_invalid_relation11": "Field '%s' has wrong relation. Expected an array.",
+    "validation.field_invalid_relation1n": "Field '%s' has wrong relation. No array expected."
+  },
+  "it-IT": {
+    "validation.field_required": "Campo '%s' obbligatorio.",
+    "validation.field_invalid": "Campo '%s' ha un valore non valido.",
+    "validation.field_invalid_id": "Campo '%s' contiene in id non valido.",
+    "validation.field_minlen": "Campo '%s' deve contenere almeno %v caratteri.",
+    "validation.field_maxlen": "Campo '%s' può contenere al massimo %v caratteri.",
+    "validation.entry_exists": "%s esiste già per il valore '%v'.",
+    "validation.field_not_exclusive": "Solo uno dei campi può essere impostato: '%s'' o '%s'.",
+    "validation.field_required_exclusive": "Campo '%s' o '%s' obbligatorio.",
+    "validation.field_invalid_relation11": "Campo '%s' ha una correlazione errata. Necessario uso di array.",
+    "validation.field_invalid_relation1n": "Campo '%s' ha una correlazione errata. Uso di array non accettabile."
+  }
+}
