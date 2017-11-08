@@ -1,37 +1,15 @@
-import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT_SUCCESS } from '../actions/auth'
+import { AUTHENTICATED, UNAUTHENTICATED, AUTHENTICATION_ERROR } from '../actions/auth'
 
-// The auth reducer. The starting state sets authentication
-// based on a token being in local storage. In a real app,
-// we would also want a util to check if the token is expired.
-export function auth(state = {
-    isFetching: false,
-    isAuthenticated: localStorage.getItem('id_token') ? true : false
-}, action) {
-    switch (action.type) {
-        case LOGIN_REQUEST:
-            return Object.assign({}, state, {
-                isFetching: true,
-                isAuthenticated: false,
-                user: action.creds
-            })
-        case LOGIN_SUCCESS:
-            return Object.assign({}, state, {
-                isFetching: false,
-                isAuthenticated: true,
-                errorMessage: ''
-            })
-        case LOGIN_FAILURE:
-            return Object.assign({}, state, {
-                isFetching: false,
-                isAuthenticated: false,
-                errorMessage: action.message
-            })
-        case LOGOUT_SUCCESS:
-            return Object.assign({}, state, {
-                isFetching: true,
-                isAuthenticated: false
-            })
+export default function(state={}, action) {
+    switch(action.type) {
+        case AUTHENTICATED:
+            return { ...state, authenticated: true }
+        case UNAUTHENTICATED:
+            return { ...state, authenticated: false }
+        case AUTHENTICATION_ERROR:
+            return { ...state, error: action.payload }
         default:
-            return state
+            break
     }
+    return state
 }

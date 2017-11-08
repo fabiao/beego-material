@@ -1,14 +1,10 @@
 import { combineReducers } from 'redux'
-import { auth } from './auth'
+import { reducer as formReducer } from 'redux-form'
+import authReducer from './auth'
 
-// We combine the reducers here so that they
-// can be left split apart above
-function otherReducers(state = {
-}, action) {
-    return state
-}
-
-export default combineReducers({
-    auth,
-    otherReducers
+const rootReducer = combineReducers({
+    form: formReducer,
+    auth: authReducer
 })
+
+export default rootReducer

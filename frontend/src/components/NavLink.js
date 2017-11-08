@@ -9,7 +9,6 @@ const NavLink = ({ label, to, exact, icon }) => (
             if (icon) {
                 leftIcon = <FontIcon>{icon}</FontIcon>;
             }
-
             return (
                 <ListItem
                     component={RouterLink}
