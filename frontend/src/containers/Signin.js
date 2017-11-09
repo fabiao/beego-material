@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
-import { Card, CardTitle, CardText, CardActions, TextField, Button, FontIcon } from 'react-md'
-import { reduxForm } from 'redux-form'
+import { Card, CardTitle } from 'react-md'
+import SigninForm from '../components/SigninForm'
 import { signInAction } from '../actions/auth'
 
-class Signin extends Component {
+class Signin extends React.Component {
     submit = (values) => {
         this.props.signInAction(values, this.props.history)
     }
@@ -20,26 +20,11 @@ class Signin extends Component {
     }
 
     render() {
-        const { handleSubmit } = this.props
+        //const { values } = this.props
         return (
             <Card className="md-block-centered">
                 <CardTitle title="Login" subtitle="Please enter your email and password" />
-                <form className="md-grid" onSubmit={handleSubmit(this.submit)}>
-                    <TextField name="email"
-                           type="text"
-                           placeholder="Email"
-                           className="md-cell md-cell--12"
-                    />
-                    <TextField name="password"
-                           type="password"
-                           placeholder="Password"
-                           className="md-cell md-cell--12"
-                    />
-                    <CardActions className="md-cell md-cell--12">
-                        <Button raised primary type="submit" className="md-cell--right">Sign In</Button>
-                    </CardActions>
-                </form>
-                {this.errorMessage()}
+                <SigninForm onSubmit={values => this.submit(values)}/>
             </Card>
         )
     }
@@ -49,9 +34,4 @@ function mapStateToProps(state) {
     return { errorMessage: state.auth.error }
 }
 
-
-const reduxFormSignin = reduxForm({
-    form: 'signin'
-})(Signin)
-
-export default connect(mapStateToProps, {signInAction})(reduxFormSignin)
+export default connect(mapStateToProps, {signInAction})(Signin)

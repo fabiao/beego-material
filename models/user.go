@@ -8,6 +8,11 @@ type Address struct {
 	Zip    int    `json:"zip" bson:"zip"`
 }
 
+type Login struct {
+	Email    string `json:"email" bson:"email" validation:"email" required:"true"`
+	Password string `json:"password" bson:"password"`
+}
+
 type User struct {
 	mongodm.DocumentBase `json:",inline" bson:",inline"`
 

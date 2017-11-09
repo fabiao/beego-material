@@ -19,7 +19,7 @@ WebFontLoader.load({
 const createStoreWithMiddleware = applyMiddleware(reduxThunk)(createStore)
 const store = createStoreWithMiddleware(rootReducer)
 const user = localStorage.getItem('user')
-if(user) {
+if (user) {
     store.dispatch({ type: AUTHENTICATED })
 }
 

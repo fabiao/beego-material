@@ -1,7 +1,7 @@
 package test
 
 import (
-	_ "github.com/bealabs/beego-material/routers"
+	_ "github.com/fabiao/beego-material/routers"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"

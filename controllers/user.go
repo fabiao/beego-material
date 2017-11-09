@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/bealabs/beego-material/models"
+	"github.com/fabiao/beego-material/models"
 	"github.com/juusechec/jwt-beego"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
@@ -315,6 +315,12 @@ func (self *UserController) Get() {
 	}
 
 	self.response.AddContent("user", user)
+	self.response.SetStatus(http.StatusOK)
+	self.response.ServeJSON()
+}
+
+func (self *UserController) Signin() {
+	self.response.AddContent("user", "1234567890")
 	self.response.SetStatus(http.StatusOK)
 	self.response.ServeJSON()
 }

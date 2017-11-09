@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import NavLink from './NavLink'
 
 class AccountMenu extends React.Component {
-    componentDidMount() {
+    /*componentDidMount() {
 
     }
 
@@ -18,7 +18,7 @@ class AccountMenu extends React.Component {
         if (nextProps.record !== this.state.proximityProfile) {
             this.setState({proximityProfile: nextProps.record})
         }
-    }
+    }*/
 
     render() {
         const { simplifiedMenu } = this.props
@@ -28,16 +28,19 @@ class AccountMenu extends React.Component {
                 //menuItems={['Preferences', 'About', { divider: true }, 'Log out']}
                 menuItems={
                     [<NavLink
+                        key='/account-settings'
                         label='Settings'
                         to='/account-settings'
                         icon='account_box'
                     />,
                     <NavLink
+                        key='/about'
                         label='About'
                         to='/about'
                         icon='info'
                     />, {divider: true},
                     <NavLink
+                        key='/signout'
                         label='Logout'
                         to='/signout'
                         icon='exit_to_app'

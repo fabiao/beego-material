@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/bealabs/beego-material/models"
+	"github.com/fabiao/beego-material/models"
 	response "github.com/zebresel-com/beego-response"
 	"github.com/zebresel-com/mongodm"
 )

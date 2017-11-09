@@ -3,7 +3,7 @@ package routers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
-	"github.com/bealabs/beego-material/controllers"
+	"github.com/fabiao/beego-material/controllers"
 	response "github.com/zebresel-com/beego-response"
 	"net/http"
 )
@@ -68,6 +68,9 @@ func init() {
 	)
 
 	beego.AddNamespace(ns)
+
+	// Public routes
+	beego.Router("/signin", &controllers.UserController{}, "post:Signin")
 
 	beego.DelStaticPath("/static")
 	beego.SetStaticPath("/", "frontend")

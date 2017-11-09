@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/bealabs/beego-material/models"
+	"github.com/fabiao/beego-material/models"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
 )
