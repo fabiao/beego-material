@@ -201,6 +201,18 @@
 			"revisionTime": "2017-03-31T15:17:37Z"
 		},
 		{
+			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",
+			"path": "golang.org/x/crypto/pbkdf2",
+			"revision": "6a293f2d4b14b8e6d3f0539e383f6d0d30fce3fd",
+			"revisionTime": "2017-09-25T11:22:06Z"
+		},
+		{
+			"checksumSHA1": "dHh6VeHcbNg11miGjGEl8LbPe7w=",
+			"path": "golang.org/x/crypto/scrypt",
+			"revision": "6a293f2d4b14b8e6d3f0539e383f6d0d30fce3fd",
+			"revisionTime": "2017-09-25T11:22:06Z"
+		},
+		{
 			"checksumSHA1": "1D8GzeoFGUs5FZOoyC2DpQg8c5Y=",
 			"path": "gopkg.in/mgo.v2",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
@@ -229,11 +241,7 @@
 			"path": "gopkg.in/mgo.v2/internal/scram",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
 			"revisionTime": "2016-08-18T02:01:20Z"
-		},
-		{
-			"path": "https://github.com/astaxie/beego",
-			"revision": ""
 		}
 	],
-	"rootPath": "github.com/bealabs/beego-material"
+	"rootPath": "github.com/fabiao/beego-material"
 }

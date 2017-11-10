@@ -298,7 +298,7 @@ func (self *UserController) GetAll() {
 	}
 
 	self.response.CreatePaging(self.paging.skip, self.paging.limit, queryCount, len(users))
-	self.response.AddContent("users", users)
+	self.response.AddContent(models.UserCollectionName, users)
 	self.response.SetStatus(http.StatusOK)
 	self.response.ServeJSON()
 }
