@@ -27,13 +27,13 @@ func scrypt2Hash(clearPassword string, salt []byte) ([]byte, error) {
 	return scrypt.Key([]byte(clearPassword), salt, ITERATIONS, R, P, KEY_LEN)
 }
 
-func HashAndSalt(src string) (hashHex string, saltHex string, err error) {
+func HashAndSalt(clearPassword string) (hashHex string, saltHex string, err error) {
 	salt, err := GenerateRandomBytes(SALT_LENGTH)
 	if err != nil {
 		return "", "", err
 	}
 
-	hash, err := scrypt2Hash(src, salt)
+	hash, err := scrypt2Hash(clearPassword, salt)
 	if err != nil {
 		return "", "", err
 	}
@@ -44,17 +44,17 @@ func HashAndSalt(src string) (hashHex string, saltHex string, err error) {
 	return hashHex, saltHex, nil
 }
 
-func VerifyHash(src string, hash string, salt string) (bool, error) {
+func VerifyHash(clearPassword string, hash string, salt string) (bool, error) {
 	saltBytes, err := hex.DecodeString(salt)
 	if err != nil {
 		return false, err
 	}
 
-	srcHash, err := scrypt2Hash(src, saltBytes)
+	clearPasswordHash, err := scrypt2Hash(clearPassword, saltBytes)
 	if err != nil {
 		return false, err
 	}
 
-	srcHashHex := hex.EncodeToString(srcHash)
+	srcHashHex := hex.EncodeToString(clearPasswordHash)
 	return srcHashHex == hash, nil
 }

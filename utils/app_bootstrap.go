@@ -5,18 +5,53 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/fabiao/beego-material/models"
 	"github.com/zebresel-com/mongodm"
+	"gopkg.in/mgo.v2"
 )
 
 func dbSetup() (*mongodm.Model, bool) {
 	dbm := GetDbManager()
 	if dbm != nil {
-		userModel, err := dbm.RegisterModel(&models.User{}, models.UserModelName, models.UserCollectionName, [][]string{{"firstname", "lastname"}, {"email"}})
+		userModel, err := dbm.RegisterModel(&models.User{}, models.UserModelName, models.UserCollectionName, []mgo.Index{
+			{
+				Key:        []string{"firstName", "lastName"},
+				Unique:     true,
+				DropDups:   false,
+				Background: true,
+			},
+			{
+				Key:        []string{"email"},
+				Unique:     true,
+				DropDups:   false,
+				Background: true,
+			},
+		})
 		if err != nil {
 			beego.Error(models.UserModelName+" model registration failed: ", err)
 			return nil, false
 		}
 
-		_, err = dbm.RegisterModel(&models.Company{}, models.CompanyModelName, models.CompanyCollectionName, [][]string{{"name"}})
+		_, err = dbm.RegisterModel(&models.UserSession{}, models.UserSessionModelName, models.UserSessionCollectionName, []mgo.Index{
+			{
+				Key:         []string{"token"},
+				Unique:      true,
+				DropDups:    false,
+				Background:  true,
+				ExpireAfter: SESSION_TOKEN_EXPIRATION_TIME_SECS,
+			},
+		})
+		if err != nil {
+			beego.Error(models.UserSessionModelName+" model registration failed: ", err)
+			return nil, false
+		}
+
+		_, err = dbm.RegisterModel(&models.Company{}, models.CompanyModelName, models.CompanyCollectionName, []mgo.Index{
+			{
+				Key:        []string{"name"},
+				Unique:     true,
+				DropDups:   false,
+				Background: true,
+			},
+		})
 		if err != nil {
 			beego.Error(models.CompanyModelName+" model registration failed: ", err)
 			return nil, false
@@ -40,9 +75,9 @@ func createAdmin(mongoDmModel *mongodm.Model, roleManager RoleManageable) bool {
 	user.LastName = "Di Francesco"
 	user.Email = "fabio.difrancesco@gmail.com"
 	user.Address = &models.Address{
-		Street: "Viale Gran San Bernardo 17",
-		Zip:    "11100",
-		City:   "Aosta",
+		Street:  "Viale Gran San Bernardo 17",
+		ZipCode: "11100",
+		City:    "Aosta",
 	}
 	passwordHash, passwordSalt, err := HashAndSalt("password")
 	if err != nil {

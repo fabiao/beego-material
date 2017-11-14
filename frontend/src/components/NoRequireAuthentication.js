@@ -6,13 +6,13 @@ export default function (ComposedComponent) {
     class NoRequireAuthentication extends Component {
         componentWillMount() {
             if (this.props.authenticated) {
-                this.props.history.push('/secret')
+                this.props.history.push('/')
             }
         }
 
         componentWillUpdate(nextProps) {
             if (nextProps.authenticated) {
-                this.props.history.push('/secret')
+                this.props.history.push('/')
             }
         }
 

@@ -1,10 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { Card, CardTitle } from 'react-md'
 import SigninForm from '../components/SigninForm'
 import { signInAction } from '../actions/auth'
 
-class Signin extends React.Component {
+class Signin extends React.PureComponent {
     submit = (values) => {
         this.props.signInAction(values, this.props.history)
     }
@@ -23,7 +24,7 @@ class Signin extends React.Component {
         //const { values } = this.props
         return (
             <Card className="md-block-centered">
-                <CardTitle title="Login" subtitle="Please enter your email and password" />
+                <CardTitle title="Login" subtitle={<span>Don't have an account? <Link to="/signup">Sign Up</Link></span>} />
                 <SigninForm onSubmit={values => this.submit(values)}/>
             </Card>
         )

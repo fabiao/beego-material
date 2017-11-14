@@ -10,12 +10,15 @@ import (
 )
 
 const (
-	DB_HOST = "127.0.0.1:27017"
-	DB_NAME = "beego-material"
+	DB_HOST      = "127.0.0.1:27017"
+	DB_NAME      = "beego-material"
+	LOCALS_FILE  = "conf/locals.json"
+	DEFAULT_LANG = "it-IT"
 )
 
 type DbManageable interface {
-	RegisterModel(document mongodm.IDocumentBase, modelName string, collectionName string, uniqueIndices [][]string) (*mongodm.Model, error)
+	Connection() *mongodm.Connection
+	RegisterModel(document mongodm.IDocumentBase, modelName string, collectionName string, indexFieldSettings []mgo.Index) (*mongodm.Model, error)
 }
 
 type DbManager struct {
@@ -33,7 +36,7 @@ func GetDbManager() DbManageable {
 		}
 
 		// Specify, if available, localisation file for automatic validation output
-		file, err := ioutil.ReadFile("locals/locals.json")
+		file, err := ioutil.ReadFile(LOCALS_FILE)
 		if err != nil {
 			beego.Error("Localization file load failed: ", err)
 		} else {
@@ -44,7 +47,7 @@ func GetDbManager() DbManageable {
 				beego.Error("Local map unmarshalling failed: ", err)
 			}
 
-			dbConfig.Locals = localMap["it-IT"]
+			dbConfig.Locals = localMap[DEFAULT_LANG]
 		}
 
 		// Connect and check for error
@@ -61,23 +64,23 @@ func GetDbManager() DbManageable {
 	return dbm
 }
 
-func (self *DbManager) RegisterModel(document mongodm.IDocumentBase, modelName string, collectionName string, uniqueIndices [][]string) (*mongodm.Model, error) {
+func (self *DbManager) Connection() *mongodm.Connection {
+	return self.db
+}
+
+func (self *DbManager) RegisterModel(document mongodm.IDocumentBase, modelName string, collectionName string, indexFieldSettings []mgo.Index) (*mongodm.Model, error) {
 	self.db.Register(document, collectionName)
 	model := self.db.Model(modelName)
 	if model == nil {
 		return model, errors.New(modelName + " model creation failed")
 	}
 
-	for _, k := range uniqueIndices {
-		err := model.EnsureIndex(
-			mgo.Index{
-				Key:        k,
-				Unique:     true,
-				DropDups:   false,
-				Background: true,
-			})
-		if err != nil {
-			return model, err
+	if indexFieldSettings != nil {
+		for _, indexFieldSetting := range indexFieldSettings {
+			err := model.EnsureIndex(indexFieldSetting)
+			if err != nil {
+				return model, err
+			}
 		}
 	}
 

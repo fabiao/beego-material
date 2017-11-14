@@ -51,26 +51,25 @@ func init() {
 		}
 	}
 
-	// Each route has to pass the filter implemented above
-	beego.InsertFilter("/api/*", beego.BeforeRouter, FilterAuthenticated)
-
-	// This is a global namespace for all routes -> http://HOST/api/...
-	ns := beego.NewNamespace("/api",
-		beego.NSNamespace("/user",
-			beego.NSRouter("/token", &controllers.UserController{}, "get:GetToken"),
-			beego.NSRouter("/", &controllers.UserController{}, "get:GetAll;post:Create;put:Update"),
-			beego.NSRouter("/:id", &controllers.UserController{}, "get:Get"),
-		),
-		beego.NSNamespace("/message",
-			beego.NSRouter("/", &controllers.MessageController{}, "get:GetAll;post:Create;put:Update"),
-			beego.NSRouter("/:id", &controllers.MessageController{}, "get:Get"),
-		),
+	// Auth namespaces
+	beego.InsertFilter("/user/*", beego.BeforeRouter, FilterAuthenticated)
+	userNS := beego.NewNamespace("/user",
+		beego.NSRouter("/token", &controllers.UserController{}, "get:GetToken"),
+		beego.NSRouter("/all", &controllers.UserController{}, "get:GetAll"),
+		beego.NSRouter("/", &controllers.UserController{}, "get:Get;post:Create;put:Update"),
 	)
+	beego.AddNamespace(userNS)
 
-	beego.AddNamespace(ns)
+	beego.InsertFilter("/message/*", beego.BeforeRouter, FilterAuthenticated)
+	messageNS := beego.NewNamespace("/message",
+		beego.NSRouter("/", &controllers.MessageController{}, "get:GetAll;post:Create;put:Update"),
+		beego.NSRouter("/:id", &controllers.MessageController{}, "get:Get"),
+	)
+	beego.AddNamespace(messageNS)
 
 	// Public routes
-	beego.Router("/signin", &controllers.UserController{}, "post:Signin")
+	beego.Router("/signin", &controllers.AccountController{}, "post:Signin")
+	beego.Router("/signup", &controllers.AccountController{}, "post:Signup")
 
 	beego.DelStaticPath("/static")
 	beego.SetStaticPath("/", "frontend")

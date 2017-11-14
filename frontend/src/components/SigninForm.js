@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { reduxForm, Field } from 'redux-form'
 import { Button, CardActions, FontIcon } from 'react-md'
 import { renderMdTextField } from '../utils/md_form_input_renderers'
@@ -14,6 +15,8 @@ const SigninForm = ({ handleSubmit }) => (
             component={renderMdTextField}
             leftIcon={<FontIcon>mail_outline</FontIcon>}
             required
+            minlen={5}
+            maxlen={255}
         />
         <Field
             id="password"
@@ -24,8 +27,11 @@ const SigninForm = ({ handleSubmit }) => (
             component={renderMdTextField}
             leftIcon={<FontIcon>lock</FontIcon>}
             required
+            minlen={5}
+            maxlen={255}
         />
-        <CardActions className="md-cell md-cell--12" style={{padding: 0}}>
+        <CardActions className="md-cell md-cell--12 no-padding">
+            <Button type="button" className="md-cell--left" onClick={e => {alert('hello')}}>Forgot your password?</Button>
             <Button type="submit" raised primary className="md-cell--right">Sign In</Button>
         </CardActions>
     </form>

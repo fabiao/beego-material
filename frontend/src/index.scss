@@ -5,3 +5,12 @@
 body {
   margin: 0;
 }
+
+.no-padding {
+  padding: 0 !important;
+}
+
+.notif__container {
+  top: auto !important;
+  bottom: 0px !important;
+}

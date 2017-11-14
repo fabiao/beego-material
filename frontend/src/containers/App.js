@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Route, Switch } from 'react-router-dom'
 import { NavigationDrawer } from 'react-md'
 import requireAuth from '../components/Authentication'
@@ -9,7 +9,7 @@ import Home from './Home'
 import Signin from './Signin'
 import Signup from './Signup'
 import Signout from './Signout'
-import Page1 from './Page1'
+import UserSettings from './UserSettings'
 
 const navItems = [{
     exact: true,
@@ -36,7 +36,7 @@ const NoMatch = ({ location }) => (
     </div>
 )
 
-class App extends Component {
+class App extends React.Component {
     render() {
         return (
             <NavigationDrawer
@@ -53,7 +53,7 @@ class App extends Component {
                     <Route exact path="/signin" component={noRequireAuth(Signin)} />
                     <Route exact path="/signup" component={noRequireAuth(Signup)} />
                     <Route exact path="/signout" component={requireAuth(Signout)} />
-                    <Route exact path="/page-1" component={requireAuth(Page1)} />
+                    <Route exact path="/user-settings" component={requireAuth(UserSettings)} />
                     <Route component={NoMatch}/>
                 </Switch>
             </NavigationDrawer>

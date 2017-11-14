@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"github.com/fabiao/beego-material/models"
+	"github.com/fabiao/beego-material/utils"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
 )
 
 type MessageController struct {
-	baseController
+	BaseController
 }
 
 /**
@@ -44,8 +45,8 @@ type MessageController struct {
         "id": "564c87e1e5feae0e3a000001",
         "createdAt": "2015-11-18T15:14:57.081+01:00",
         "updatedAt": "2015-11-18T15:14:57.081+01:00",
-        "firstname": "Bob",
-        "lastname": "Marley",
+        "firstName": "Bob",
+        "lastName": "Marley",
         "username": "",
         "email": "bob@marley.de",
         "address": {
@@ -59,8 +60,8 @@ type MessageController struct {
           "id": "564b3879e5feaed231000002",
           "createdAt": "2015-11-17T15:23:53.439+01:00",
           "updatedAt": "2015-11-17T15:23:53.439+01:00",
-          "firstname": "Bob",
-          "lastname": "Marley",
+          "firstName": "Bob",
+          "lastName": "Marley",
           "username": "",
           "email": "bob@marley.de",
           "address": {
@@ -73,8 +74,8 @@ type MessageController struct {
           "id": "564c87e1e5feae0e3a000001",
           "createdAt": "2015-11-18T15:14:57.081+01:00",
           "updatedAt": "2015-11-18T15:14:57.081+01:00",
-          "firstname": "Bob",
-          "lastname": "Marley",
+          "firstName": "Bob",
+          "lastName": "Marley",
           "username": "",
           "email": "bob@marley.de",
           "address": {
@@ -101,8 +102,9 @@ type MessageController struct {
  *
 */
 func (self *MessageController) GetAll() {
+	db := utils.GetDbManager()
 
-	Message := self.db.Model("message")
+	Message := db.Connection().Model("Message")
 	messages := []*models.Message{}
 
 	query := bson.M{"deleted": false}
@@ -115,7 +117,7 @@ func (self *MessageController) GetAll() {
 		return
 	}
 
-	err := Message.Find(query).Sort("sender").Skip(self.paging.skip).Limit(self.paging.limit).Populate("Sender").Exec(&messages)
+	err := Message.Find(query).Sort("sender").Skip(self.paging.skip).Limit(self.paging.take).Populate("Sender").Exec(&messages)
 
 	if err != nil {
 		self.response.Error(http.StatusInternalServerError)
@@ -132,7 +134,7 @@ func (self *MessageController) GetAll() {
 		}
 	}
 
-	self.response.CreatePaging(self.paging.skip, self.paging.limit, queryCount, len(messages))
+	self.response.CreatePaging(self.paging.skip, self.paging.take, queryCount, len(messages))
 	self.response.AddContent("messages", messages)
 	self.response.ServeJSON()
 }
@@ -211,29 +213,26 @@ func (self *MessageController) GetAll() {
 }
 */
 func (self *MessageController) Create() {
+	db := utils.GetDbManager()
 
-	Message := self.db.Model("Message")
+	Message := db.Connection().Model("Message")
 	message := &models.Message{}
 
 	err, _ := Message.New(message, self.Ctx.Input.RequestBody)
 
 	if err != nil {
-		self.response.Error(http.StatusBadRequest, err)
+		self.response.CustomError(http.StatusBadRequest, 0, err.Error())
 		return
 	}
 
 	if valid, issues := message.Validate(); valid {
-
 		err = message.Save()
-
 		if err != nil {
 
 			self.response.Error(http.StatusInternalServerError)
 			return
 		}
-
 	} else {
-
 		self.response.Error(http.StatusBadRequest, issues)
 		return
 	}
@@ -244,29 +243,25 @@ func (self *MessageController) Create() {
 }
 
 func (self *MessageController) Update() {
+	db := utils.GetDbManager()
 
-	Message := self.db.Model("Message")
+	Message := db.Connection().Model("Message")
 	message := &models.Message{}
 
 	err, _ := Message.New(message, self.Ctx.Input.RequestBody)
-
 	if err != nil {
-		self.response.Error(http.StatusBadRequest, err)
+		self.response.CustomError(http.StatusBadRequest, 0, err.Error())
 		return
 	}
 
 	if valid, issues := message.Validate(); valid {
-
 		err = message.Save()
-
 		if err != nil {
-
 			self.response.Error(http.StatusInternalServerError)
 			return
 		}
 
 	} else {
-
 		self.response.Error(http.StatusBadRequest, issues)
 		return
 	}

@@ -105,8 +105,10 @@ const performRequest = async (method, url, params, request) => {
             fetchState.message = response.data.error
         }
     }
-    catch (error) {
-        fetchState.message = error
+    catch (ex) {
+        fetchState.name = ex.response.status
+        fetchState.message = ex.response.statusText
+        fetchState.data = ex.response.data
     }
 
     return fetchState

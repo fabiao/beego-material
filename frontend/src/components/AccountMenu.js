@@ -7,44 +7,58 @@ import {
     DropdownMenu
 } from 'react-md'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import NavLink from './NavLink'
+import { getUser } from '../utils/session_storage'
 
 class AccountMenu extends React.Component {
-    /*componentDidMount() {
-
+    constructor(props) {
+        super(props)
+        this.state = {
+            user: this.props.user
+        }
     }
 
-    componentWillReceiveProps(nextProps) {
+    /*componentWillReceiveProps(nextProps) {
         if (nextProps.record !== this.state.proximityProfile) {
             this.setState({proximityProfile: nextProps.record})
         }
     }*/
 
-    render() {
+    renderPubMenu = () => {
+        return (
+            <Link to="/signin">
+                <IconSeparator label="Signin">
+                    <FontIcon>login</FontIcon>
+                </IconSeparator>
+            </Link>
+        )
+    }
+
+    renderAuthMenu = (user) => {
         const { simplifiedMenu } = this.props
         return (
             <DropdownMenu
                 id={`${!simplifiedMenu ? 'smart-' : ''}avatar-dropdown-menu`}
-                //menuItems={['Preferences', 'About', { divider: true }, 'Log out']}
                 menuItems={
                     [<NavLink
-                        key='/account-settings'
+                        key='/user-settings'
                         label='Settings'
-                        to='/account-settings'
+                        to='/user-settings'
                         icon='account_box'
                     />,
-                    <NavLink
-                        key='/about'
-                        label='About'
-                        to='/about'
-                        icon='info'
-                    />, {divider: true},
-                    <NavLink
-                        key='/signout'
-                        label='Logout'
-                        to='/signout'
-                        icon='exit_to_app'
-                    />]
+                        <NavLink
+                            key='/about'
+                            label='About'
+                            to='/about'
+                            icon='info'
+                        />, {divider: true},
+                        <NavLink
+                            key='/signout'
+                            label='Logout'
+                            to='/signout'
+                            icon='exit_to_app'
+                        />]
                 }
                 anchor={{
                     x: DropdownMenu.HorizontalAnchors.INNER_RIGHT,
@@ -60,23 +74,26 @@ class AccountMenu extends React.Component {
                     component={IconSeparator}
                     iconBefore
                     label={
-                        <IconSeparator label="some.email@example.com">
+                        <IconSeparator label={user.email}>
                             <FontIcon>arrow_drop_down</FontIcon>
                         </IconSeparator>
                     }
                 >
-                    <Avatar suffix="pink">S</Avatar>
+                    <Avatar suffix="blue">{user.firstName[0].toUpperCase()}</Avatar>
                 </AccessibleFakeButton>
             </DropdownMenu>
         )
+    }
+
+    render() {
+        const { user } = this.state
+        return user != null ? this.renderAuthMenu(user) : this.renderPubMenu()
     }
 }
 
 
 function mapStateToProps(state) {
-    return {
-        authenticated: state.auth.authenticated
-    }
+    return  { user: getUser() }
 }
 
 export default connect(mapStateToProps)(AccountMenu)

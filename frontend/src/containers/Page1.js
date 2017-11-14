@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, CardTitle, CardText } from 'react-md'
 
-export default class Page1 extends React.Component {
+export default class Page1 extends React.PureComponent {
     render() {
         return (
             <div className="md-grid md-text-container">

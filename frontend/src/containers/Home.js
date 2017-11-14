@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
 import './Home.css'
 import logo from '../logo.svg'
 
-export default class Home extends Component {
+export default class Home extends React.PureComponent {
     render() {
         return (
             <div className="home">
