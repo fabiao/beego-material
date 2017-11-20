@@ -4,7 +4,7 @@ import { Card, CardTitle } from 'react-md'
 import SignupForm from '../components/SignupForm'
 import { signUpAction } from '../actions/auth'
 
-class Signup extends React.PureComponent {
+class Signup extends React.Component {
     submit = (values) => {
         this.props.signUpAction(values, this.props.history)
     }
@@ -29,9 +29,5 @@ class Signup extends React.PureComponent {
     }
 }
 
-function mapStateToProps(state) {
-    return { errorMessage: state.auth.error }
-}
-
-export default connect(mapStateToProps, {signUpAction})(Signup)
+export default connect(null, {signUpAction})(Signup)
 

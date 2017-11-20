@@ -5,7 +5,7 @@ import { Card, CardTitle } from 'react-md'
 import SigninForm from '../components/SigninForm'
 import { signInAction } from '../actions/auth'
 
-class Signin extends React.PureComponent {
+class Signin extends React.Component {
     submit = (values) => {
         this.props.signInAction(values, this.props.history)
     }
@@ -21,18 +21,13 @@ class Signin extends React.PureComponent {
     }
 
     render() {
-        //const { values } = this.props
         return (
             <Card className="md-block-centered">
                 <CardTitle title="Login" subtitle={<span>Don't have an account? <Link to="/signup">Sign Up</Link></span>} />
-                <SigninForm onSubmit={values => this.submit(values)}/>
+                <SigninForm onCancel={e => this.props.history.push('/recover-password')} onSubmit={values => this.submit(values)}/>
             </Card>
         )
     }
 }
 
-function mapStateToProps(state) {
-    return { errorMessage: state.auth.error }
-}
-
-export default connect(mapStateToProps, {signInAction})(Signin)
+export default connect(null, {signInAction})(Signin)

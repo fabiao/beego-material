@@ -6,18 +6,13 @@ import (
 	"github.com/fabiao/beego-material/models"
 	"github.com/zebresel-com/mongodm"
 	"gopkg.in/mgo.v2"
+	"time"
 )
 
 func dbSetup() (*mongodm.Model, bool) {
 	dbm := GetDbManager()
 	if dbm != nil {
 		userModel, err := dbm.RegisterModel(&models.User{}, models.UserModelName, models.UserCollectionName, []mgo.Index{
-			{
-				Key:        []string{"firstName", "lastName"},
-				Unique:     true,
-				DropDups:   false,
-				Background: true,
-			},
 			{
 				Key:        []string{"email"},
 				Unique:     true,
@@ -32,11 +27,20 @@ func dbSetup() (*mongodm.Model, bool) {
 
 		_, err = dbm.RegisterModel(&models.UserSession{}, models.UserSessionModelName, models.UserSessionCollectionName, []mgo.Index{
 			{
-				Key:         []string{"token"},
-				Unique:      true,
-				DropDups:    false,
+				Key:        []string{"userId"},
+				Unique:     false,
+				Background: true,
+			},
+			{
+				Key:        []string{"token"},
+				Unique:     true,
+				Background: true,
+			},
+			{
+				Key:         []string{"createdAt"},
+				Unique:      false,
 				Background:  true,
-				ExpireAfter: SESSION_TOKEN_EXPIRATION_TIME_SECS,
+				ExpireAfter: time.Duration(SESSION_TOKEN_EXPIRATION_TIME_MINS) * time.Minute,
 			},
 		})
 		if err != nil {

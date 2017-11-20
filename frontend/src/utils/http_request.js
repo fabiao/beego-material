@@ -1,4 +1,7 @@
-import axios from 'axios'
+
+
+
+import axios from "axios/index";
 
 export class FetchState {
     constructor(name, message) {
@@ -84,11 +87,7 @@ const mapFetchState = (code) => {
     return new FetchState(FetchCode.INVALID_REQUEST, 'Codice errore HTTP non supportato')
 }
 
-const publicRequest = axios.create({
-    headers: {'Content-Type': 'application/json'}
-})
-
-const performRequest = async (method, url, params, request) => {
+const performRequest = async (method, url, params, requestInstance) => {
     const body = method === 'get' ? 'params' : 'data'
     const config = {
         method,
@@ -97,69 +96,82 @@ const performRequest = async (method, url, params, request) => {
     }
 
     let fetchState = new FetchState(FetchCode.UNKNOWN_ERROR, 'Unexpected exception thrown')
+    let response = null
     try {
-        const response = await request.request(config)
-        fetchState = mapFetchState(response.status)
-        fetchState.data = response.data
-        if ((response.status === 500 || response.status === 409) && response.data.error !== undefined) {
-            fetchState.message = response.data.error
-        }
+        response = await requestInstance.request(config)
     }
     catch (ex) {
-        fetchState.name = ex.response.status
-        fetchState.message = ex.response.statusText
-        fetchState.data = ex.response.data
+        response = ex.response
+    }
+
+    fetchState = mapFetchState(response.status)
+    fetchState.data = response.data
+    // Override with server error message
+    //alert(JSON.stringify(response))
+    if (response.data.error !== undefined) {
+        switch(response.status) {
+            case 401:
+            case 403:
+            case 409:
+            case 500: {
+                fetchState.message = response.data.error.message
+                break
+            }
+            default:
+                break
+        }
     }
 
     return fetchState
 }
 
-const performPublicRequest = (method, url, params) => {
-    return performRequest(method, url, params, publicRequest)
-}
-
-const authRequest = axios.create({
+// Public
+const publicRequestInstance = axios.create({
     headers: {'Content-Type': 'application/json'}
 })
 
-export const setAuthRequestToken = (token) => {
-    authRequest.defaults.headers.common['Authorization'] = 'Bearer ' + token
-}
-
-export const performAuthRequest = async (method, url, params) => {
-    return performRequest(method, url, params, authRequest)
-}
-
-// Public interface
 export const get = (url, params) => {
-    return performPublicRequest('GET', url, params)
+    return performRequest('GET', url, params, publicRequestInstance)
 }
 
 export const post = (url, data) => {
-    return performPublicRequest('POST', url, data)
+    return performRequest('POST', url, data, publicRequestInstance)
 }
 
 export const put = (url, data) => {
-    return performPublicRequest('PUT', url, data)
+    return performRequest('PUT', url, data, publicRequestInstance)
 }
 
 export const del = (url, data) => {
-    return performPublicRequest('DELETE', url, data)
+    return performRequest('DELETE', url, data, publicRequestInstance)
 }
 
-// Auth interface
+// Auth
+const authRequestInstance = axios.create({
+    headers: {'Content-Type': 'application/json'}
+})
+
+export const updateAuthRequestToken = (token) => {
+    //if (token == null) { alert('Null token in updateAuthRequestToken') }
+    authRequestInstance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+}
+
 export const getAuth = (url, params) => {
-    return performAuthRequest('GET', url, params)
+    //alert(authRequestInstance.defaults.headers.common['Authorization'])
+    return performRequest('GET', url, params, authRequestInstance)
 }
 
 export const postAuth = (url, data) => {
-    return performAuthRequest('POST', url, data)
+    //alert(authRequestInstance.defaults.headers.common['Authorization'])
+    return performRequest('POST', url, data, authRequestInstance)
 }
 
 export const putAuth = (url, data) => {
-    return performAuthRequest('PUT', url, data)
+    //alert(authRequestInstance.defaults.headers.common['Authorization'])
+    return performRequest('PUT', url, data, authRequestInstance)
 }
 
 export const delAuth = (url, data) => {
-    return performAuthRequest('DELETE', url, data)
+    //alert(authRequestInstance.defaults.headers.common['Authorization'])
+    return performRequest('DELETE', url, data, authRequestInstance)
 }

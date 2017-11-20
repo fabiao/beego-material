@@ -1,10 +1,9 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { reduxForm, Field } from 'redux-form'
 import { Button, CardActions, FontIcon } from 'react-md'
 import { renderMdTextField } from '../utils/md_form_input_renderers'
 
-const SigninForm = ({ handleSubmit }) => (
+const SigninForm = ({ handleSubmit, onCancel }) => (
     <form className="md-grid" onSubmit={handleSubmit}>
         <Field
             id="email"
@@ -31,7 +30,7 @@ const SigninForm = ({ handleSubmit }) => (
             maxlen={255}
         />
         <CardActions className="md-cell md-cell--12 no-padding">
-            <Button type="button" className="md-cell--left" onClick={e => {alert('hello')}}>Forgot your password?</Button>
+            <Button type="button" raised className="md-cell--left" onClick={e => onCancel()}>Forgot your password?</Button>
             <Button type="submit" raised primary className="md-cell--right">Sign In</Button>
         </CardActions>
     </form>

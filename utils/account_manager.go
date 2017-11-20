@@ -2,8 +2,8 @@ package utils
 
 import (
 	"errors"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/fabiao/beego-material/models"
-	"github.com/juusechec/jwt-beego"
 	"github.com/zebresel-com/mongodm"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SESSION_TOKEN_EXPIRATION_TIME_SECS = 3600 // 1h
+	SESSION_TOKEN_EXPIRATION_TIME_MINS = 60
 )
 
 func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
@@ -33,9 +33,13 @@ func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
 		return "", nil, http.StatusUnauthorized, errors.New("Unauthorized user")
 	}
 
-	et := jwtbeego.EasyToken{
-		Username: user.Email,
-		Expires:  time.Now().Unix() + SESSION_TOKEN_EXPIRATION_TIME_SECS,
+	timeFunc := jwt.TimeFunc()
+	now := timeFunc.Unix()
+	expiration := timeFunc.Add(time.Minute * SESSION_TOKEN_EXPIRATION_TIME_MINS).Unix()
+	et := EasyToken{
+		Username:  user.Id.Hex(),
+		IssuedAt:  now,
+		ExpiresAt: expiration,
 	}
 
 	token, err := et.GetToken()
@@ -96,6 +100,58 @@ func Signup(signup models.Signup) (string, *models.SessionUser, int, error) {
 	}
 
 	token, sessionUser, code, err := Signin(models.Signin{signup.Email, signup.Password})
+	if err != nil {
+		return "", nil, code, err
+	}
+
+	return token, sessionUser, http.StatusOK, nil
+}
+
+func Update(updateAccount models.UpdateAccount, userId string) (string, *models.SessionUser, int, error) {
+	db := GetDbManager()
+	User := db.Connection().Model(models.UserModelName)
+
+	user := &models.User{}
+	err := User.FindId(bson.ObjectIdHex(userId)).Exec(user)
+	if err != nil {
+		return "", nil, http.StatusUnauthorized, err
+	}
+
+	if user.Email != updateAccount.Email {
+		num, err := User.Find(bson.M{"email": updateAccount.Email}).Count()
+		if err != nil {
+			return "", nil, http.StatusInternalServerError, err
+		} else if num > 0 {
+			return "", nil, http.StatusInternalServerError, errors.New("Email already used by other user")
+		}
+
+		user.Email = updateAccount.Email
+	}
+
+	if updateAccount.Password != "" {
+		if updateAccount.Password != updateAccount.ConfirmPassword {
+			return "", nil, http.StatusInternalServerError, errors.New("Password confirmation don't match")
+		}
+
+		passwordHash, passwordSalt, err := HashAndSalt(updateAccount.Password)
+		if err != nil {
+			return "", nil, http.StatusInternalServerError, err
+		}
+
+		user.PasswordHash = passwordHash
+		user.PasswordSalt = passwordSalt
+	}
+
+	user.FirstName = updateAccount.FirstName
+	user.LastName = updateAccount.LastName
+	user.Address = updateAccount.Address
+
+	err = user.Save()
+	if err != nil {
+		return "", nil, http.StatusInternalServerError, err
+	}
+
+	token, sessionUser, code, err := Signin(models.Signin{updateAccount.Email, updateAccount.Password})
 	if err != nil {
 		return "", nil, code, err
 	}

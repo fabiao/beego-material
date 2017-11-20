@@ -6,10 +6,9 @@ const { notifSend } = notifActions
 
 export const AUTHENTICATED = 'authenticated_user'
 export const UNAUTHENTICATED = 'unauthenticated_user'
-export const AUTHENTICATION_ERROR = 'authentication_error'
 
 export const signUpAction = ({ firstName, lastName, email, password, confirmPassword, address }, history) => {
-    return async (dispatch) => {
+    return (dispatch) => {
         post('/signup', { firstName, lastName, email, password, confirmPassword, address })
             .then(state => {
                 switch(state.name) {
@@ -20,42 +19,45 @@ export const signUpAction = ({ firstName, lastName, email, password, confirmPass
                         return
                     }
                     case FetchCode.AUTH_FAILED: {
-                        dispatch({
-                            type: AUTHENTICATION_ERROR,
-                            payload: state.message
-                        })
+                        dispatch(notifSend({
+                            message: state.message,
+                            kind: 'warning',
+                            dismissAfter: 20000
+                        }))
+                        signOutAction(dispatch)
                         break
                     }
                     default: {
+                        dispatch(notifSend({
+                            message: state.message,
+                            kind: 'danger',
+                            dismissAfter: 20000
+                        }))
                         break
                     }
                 }
-                dispatch(notifSend({
-                    message: state.message,
-                    kind: 'danger',
-                    dismissAfter: 20000
-                }))
             })
     }
 }
 
 export const signInAction = ({ email, password }, history) => {
-    return async (dispatch) => {
+    return (dispatch) => {
         post('/signin', { email, password })
         .then(state => {
-            alert(JSON.stringify(state))
             switch(state.name) {
                 case FetchCode.SUCCESS: {
                     setUserAndToken(state.data.user, state.data.token)
                     dispatch({ type: AUTHENTICATED })
                     history.push('/')
-                    break
+                    return
                 }
                 case FetchCode.AUTH_FAILED: {
-                    dispatch({
-                        type: AUTHENTICATION_ERROR,
-                        payload: state.message
-                    })
+                    dispatch(notifSend({
+                        message: state.message,
+                        kind: 'warning',
+                        dismissAfter: 20000
+                    }))
+                    signOutAction(dispatch)
                     break
                 }
                 default: {
@@ -67,14 +69,16 @@ export const signInAction = ({ email, password }, history) => {
                     break
                 }
             }
-
         })
     }
 }
 
-export const signOutAction = () => {
-    localStorage.clear()
-    return {
-        type: UNAUTHENTICATED
-    }
+export const signOutAction = (dispatch) => {
+    setUserAndToken(null, null)
+    dispatch({type: UNAUTHENTICATED})
+    dispatch(notifSend({
+        message: 'User signed out',
+        kind: 'info',
+        dismissAfter: 20000
+    }))
 }

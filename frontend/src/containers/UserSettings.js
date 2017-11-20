@@ -1,14 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Card, CardTitle } from 'react-md'
-import UserSettingsForm from '../components/UserSettingsForm'
-import { USER_UPDATE_ERROR, updateUserAction } from '../actions/user'
+import SignupForm from '../components/SignupForm'
+import { updateUserAction } from '../actions/user'
 import {FetchCode, getAuth} from "../utils/http_request"
 import { actions as notifActions } from 'redux-notifications'
+import {signOutAction} from "../actions/auth";
 
 const { notifSend } = notifActions
 
-class UserSettings extends React.PureComponent {
+class UserSettings extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -28,21 +29,23 @@ class UserSettings extends React.PureComponent {
                         return
                     }
                     case FetchCode.AUTH_FAILED: {
-                        dispatch({
-                            type: USER_UPDATE_ERROR,
-                            payload: state.message
-                        })
+                        dispatch(notifSend({
+                            message: state.message,
+                            kind: 'warning',
+                            dismissAfter: 20000
+                        }))
+                        signOutAction(dispatch)
                         break
                     }
                     default: {
+                        dispatch(notifSend({
+                            message: state.message,
+                            kind: 'danger',
+                            dismissAfter: 20000
+                        }))
                         break
                     }
                 }
-                dispatch(notifSend({
-                    message: state.message,
-                    kind: 'danger',
-                    dismissAfter: 20000
-                }))
             })
     }
 
@@ -65,7 +68,7 @@ class UserSettings extends React.PureComponent {
         return (
             <Card className="md-block-centered">
                 <CardTitle title="Update" subtitle="Modify your info" />
-                <UserSettingsForm initialValues={user} onSubmit={values => this.submit(values)}/>
+                <SignupForm initialValues={user} onSubmit={values => this.submit(values)}/>
             </Card>
         )
     }

@@ -3,15 +3,16 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { createStore, applyMiddleware } from 'redux'
-import reduxThunk from 'redux-thunk'
+import thunk from 'redux-thunk'
 import { Notifs } from 'redux-notifications'
 import rootReducer from './reducers'
-import 'redux-notifications/lib/styles.css'
-import './index.css'
 import App from './containers/App'
 import WebFontLoader from 'webfontloader'
 import {AUTHENTICATED, UNAUTHENTICATED} from './actions/auth'
-import { checkUserAuthenticated } from './utils/session_storage'
+import { checkUserAuthenticated, getToken } from './utils/session_storage'
+import { updateAuthRequestToken } from './utils/http_request'
+import 'redux-notifications/lib/styles.css'
+import './index.css'
 
 WebFontLoader.load({
     google: {
@@ -19,9 +20,12 @@ WebFontLoader.load({
     },
 })
 
-const createStoreWithMiddleware = applyMiddleware(reduxThunk)(createStore)
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
 const store = createStoreWithMiddleware(rootReducer)
 store.dispatch({ type: checkUserAuthenticated() ? AUTHENTICATED : UNAUTHENTICATED })
+if (checkUserAuthenticated()) {
+    updateAuthRequestToken(getToken())
+}
 
 ReactDOM.render(
     <Provider store={store}>

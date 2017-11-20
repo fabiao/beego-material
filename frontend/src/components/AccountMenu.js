@@ -19,24 +19,29 @@ class AccountMenu extends React.Component {
         }
     }
 
-    /*componentWillReceiveProps(nextProps) {
-        if (nextProps.record !== this.state.proximityProfile) {
-            this.setState({proximityProfile: nextProps.record})
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.user !== this.state.user) {
+            this.setState({user: nextProps.user})
         }
-    }*/
+    }
 
     renderPubMenu = () => {
         return (
-            <Link to="/signin">
-                <IconSeparator label="Signin">
-                    <FontIcon>login</FontIcon>
-                </IconSeparator>
+            <Link className="md-fake-btn md-pointer--hover md-fake-btn--no-outline md-list-tile md-list-tile--icon md-text md-text--inherit" style={{margin: '12px 0'}} to="/signin">
+                <div className="md-ink-container"></div>
+                <div className="md-tile-addon md-tile-addon--icon">
+                    <FontIcon>input</FontIcon>
+                </div>
+                <div className="md-tile-content" style={{paddingLeft: '8px', fontSize: '20px'}}>
+                    Signin
+                </div>
             </Link>
         )
     }
 
     renderAuthMenu = (user) => {
         const { simplifiedMenu } = this.props
+        const firstNameFirstChar = user.firstName.length > 0 ? user.firstName[0].toUpperCase() : 'U'
         return (
             <DropdownMenu
                 id={`${!simplifiedMenu ? 'smart-' : ''}avatar-dropdown-menu`}
@@ -47,18 +52,13 @@ class AccountMenu extends React.Component {
                         to='/user-settings'
                         icon='account_box'
                     />,
-                        <NavLink
-                            key='/about'
-                            label='About'
-                            to='/about'
-                            icon='info'
-                        />, {divider: true},
-                        <NavLink
-                            key='/signout'
-                            label='Logout'
-                            to='/signout'
-                            icon='exit_to_app'
-                        />]
+                    {divider: true},
+                    <NavLink
+                        key='/signout'
+                        label='Logout'
+                        to='/signout'
+                        icon='exit_to_app'
+                    />]
                 }
                 anchor={{
                     x: DropdownMenu.HorizontalAnchors.INNER_RIGHT,
@@ -79,7 +79,7 @@ class AccountMenu extends React.Component {
                         </IconSeparator>
                     }
                 >
-                    <Avatar suffix="blue">{user.firstName[0].toUpperCase()}</Avatar>
+                    <Avatar suffix="blue">{firstNameFirstChar}</Avatar>
                 </AccessibleFakeButton>
             </DropdownMenu>
         )

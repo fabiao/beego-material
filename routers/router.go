@@ -54,7 +54,6 @@ func init() {
 	// Auth namespaces
 	beego.InsertFilter("/user/*", beego.BeforeRouter, FilterAuthenticated)
 	userNS := beego.NewNamespace("/user",
-		beego.NSRouter("/token", &controllers.UserController{}, "get:GetToken"),
 		beego.NSRouter("/all", &controllers.UserController{}, "get:GetAll"),
 		beego.NSRouter("/", &controllers.UserController{}, "get:Get;post:Create;put:Update"),
 	)

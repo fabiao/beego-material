@@ -3,7 +3,7 @@ import { reduxForm, Field } from 'redux-form'
 import { Button, CardActions, FontIcon } from 'react-md'
 import { renderMdTextField } from '../utils/md_form_input_renderers'
 
-const SignupForm = ({ handleSubmit }) => (
+const SignupForm = ({ handleSubmit, initialValues }) => (
     <form className="md-grid" onSubmit={handleSubmit}>
         <Field
             id="firstName"
@@ -91,6 +91,7 @@ const SignupForm = ({ handleSubmit }) => (
         <CardActions className="md-cell md-cell--12" style={{padding: 0}}>
             <Button type="submit" raised primary className="md-cell--right">Sign Up</Button>
         </CardActions>
+            <pre>{JSON.stringify(initialValues)}</pre>
     </form>
 )
 export default reduxForm({ form: 'SignupForm' })(SignupForm)

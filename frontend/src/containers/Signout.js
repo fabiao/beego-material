@@ -1,16 +1,11 @@
 import React from "react"
-import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Redirect } from "react-router-dom"
 import {signOutAction} from "../actions/auth"
 
-class Signout extends React.PureComponent {
-    static propTypes = {
-        dispatch: PropTypes.func.isRequired
-    }
-
+class Signout extends React.Component {
     componentWillMount() {
-        this.props.dispatch(signOutAction())
+        signOutAction(this.props.dispatch)
     }
 
     render() {
