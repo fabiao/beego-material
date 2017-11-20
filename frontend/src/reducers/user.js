@@ -1,15 +1,16 @@
-import { USER_LOADED } from '../actions/user'
+import { USER_LOADED, USER_UPDATED } from '../actions/user'
 
 const initialState = {
-    user: {
-        firstName: 'Pippo'
-    }
+    currentUser: null
 }
 
 export default function(state = initialState, action) {
     switch (action.type) {
         case USER_LOADED: {
-            return {...state, user: action.user}
+            return {...state, currentUser: action.currentUser}
+        }
+        case USER_UPDATED: {
+            return {...state, currentUser: action.currentUser}
         }
 
         default:

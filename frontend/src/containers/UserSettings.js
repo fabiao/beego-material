@@ -2,51 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Card, CardTitle } from 'react-md'
 import SignupForm from '../components/SignupForm'
-import { updateUserAction } from '../actions/user'
-import {FetchCode, getAuth} from "../utils/http_request"
-import { actions as notifActions } from 'redux-notifications'
-import {signOutAction} from "../actions/auth";
+import { loadUserAction, updateUserAction } from '../actions/user'
 
-const { notifSend } = notifActions
 
 class UserSettings extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            user: null
-        }
-    }
-
     componentDidMount() {
-        const { dispatch } = this.props
-        getAuth('/user')
-            .then(state => {
-                switch(state.name) {
-                    case FetchCode.SUCCESS: {
-                        this.setState({
-                            user: state.data.user
-                        })
-                        return
-                    }
-                    case FetchCode.AUTH_FAILED: {
-                        dispatch(notifSend({
-                            message: state.message,
-                            kind: 'warning',
-                            dismissAfter: 20000
-                        }))
-                        signOutAction(dispatch)
-                        break
-                    }
-                    default: {
-                        dispatch(notifSend({
-                            message: state.message,
-                            kind: 'danger',
-                            dismissAfter: 20000
-                        }))
-                        break
-                    }
-                }
-            })
+        this.props.loadUserAction()
     }
 
     submit = (values) => {
@@ -64,7 +25,7 @@ class UserSettings extends React.Component {
     }
 
     render() {
-        const { user } = this.state
+        const { user } = this.props
         return (
             <Card className="md-block-centered">
                 <CardTitle title="Update" subtitle="Modify your info" />
@@ -74,5 +35,9 @@ class UserSettings extends React.Component {
     }
 }
 
-export default connect(null, {updateUserAction})(UserSettings)
+const mapStateToProps = (state) => {
+    return { user: state.user.currentUser }
+}
+
+export default connect(mapStateToProps, {loadUserAction, updateUserAction})(UserSettings)
 
