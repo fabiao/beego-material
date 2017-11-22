@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/astaxie/beego"
+	"github.com/fabiao/beego-material/models"
 	"github.com/zebresel-com/mongodm"
 	"gopkg.in/mgo.v2"
 	"io/ioutil"
@@ -17,8 +18,10 @@ const (
 )
 
 type DbManageable interface {
-	Connection() *mongodm.Connection
 	RegisterModel(document mongodm.IDocumentBase, modelName string, collectionName string, indexFieldSettings []mgo.Index) (*mongodm.Model, error)
+	User() *mongodm.Model
+	UserSession() *mongodm.Model
+	Company() *mongodm.Model
 }
 
 type DbManager struct {
@@ -64,10 +67,6 @@ func GetDbManager() DbManageable {
 	return dbm
 }
 
-func (self *DbManager) Connection() *mongodm.Connection {
-	return self.db
-}
-
 func (self *DbManager) RegisterModel(document mongodm.IDocumentBase, modelName string, collectionName string, indexFieldSettings []mgo.Index) (*mongodm.Model, error) {
 	self.db.Register(document, collectionName)
 	model := self.db.Model(modelName)
@@ -86,4 +85,16 @@ func (self *DbManager) RegisterModel(document mongodm.IDocumentBase, modelName s
 
 	beego.Info(modelName + " model registered")
 	return model, nil
+}
+
+func (self *DbManager) User() *mongodm.Model {
+	return self.db.Model(models.UserModelName)
+}
+
+func (self *DbManager) UserSession() *mongodm.Model {
+	return self.db.Model(models.UserSessionModelName)
+}
+
+func (self *DbManager) Company() *mongodm.Model {
+	return self.db.Model(models.CompanyModelName)
 }

@@ -9,30 +9,18 @@ import {
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import NavLink from './NavLink'
-import { getUser } from '../utils/session_storage'
+
+import './AccountMenu.css'
 
 class AccountMenu extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            user: this.props.user
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.user !== this.state.user) {
-            this.setState({user: nextProps.user})
-        }
-    }
-
-    renderPubMenu = () => {
+    renderUnauthMenu = () => {
         return (
-            <Link className="md-fake-btn md-pointer--hover md-fake-btn--no-outline md-list-tile md-list-tile--icon md-text md-text--inherit" style={{margin: '12px 0'}} to="/signin">
+            <Link className="md-fake-btn md-pointer--hover md-fake-btn--no-outline md-list-tile md-list-tile--icon md-text md-text--inherit v-margin-12" to="/signin">
                 <div className="md-ink-container"></div>
                 <div className="md-tile-addon md-tile-addon--icon">
                     <FontIcon>input</FontIcon>
                 </div>
-                <div className="md-tile-content" style={{paddingLeft: '8px', fontSize: '20px'}}>
+                <div className="md-tile-content lpad8-font20">
                     Signin
                 </div>
             </Link>
@@ -68,7 +56,7 @@ class AccountMenu extends React.Component {
                 animationPosition="below"
                 sameWidth
                 simplifiedMenu={simplifiedMenu}
-                style={{padding: '12px 0'}}
+                className="v-padding-12"
             >
                 <AccessibleFakeButton
                     component={IconSeparator}
@@ -86,14 +74,14 @@ class AccountMenu extends React.Component {
     }
 
     render() {
-        const { user } = this.state
-        return user != null ? this.renderAuthMenu(user) : this.renderPubMenu()
+        const {user} = this.props
+        return user != null ? this.renderAuthMenu(user) : this.renderUnauthMenu()
     }
 }
 
 
 function mapStateToProps(state) {
-    return  { user: getUser() }
+    return  { user: state.user.currentUser }
 }
 
 export default connect(mapStateToProps)(AccountMenu)

@@ -4,15 +4,14 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/fabiao/beego-material/models"
-	"github.com/zebresel-com/mongodm"
 	"gopkg.in/mgo.v2"
 	"time"
 )
 
-func dbSetup() (*mongodm.Model, bool) {
+func dbSetup() bool {
 	dbm := GetDbManager()
 	if dbm != nil {
-		userModel, err := dbm.RegisterModel(&models.User{}, models.UserModelName, models.UserCollectionName, []mgo.Index{
+		_, err := dbm.RegisterModel(&models.User{}, models.UserModelName, models.UserCollectionName, []mgo.Index{
 			{
 				Key:        []string{"email"},
 				Unique:     true,
@@ -22,7 +21,7 @@ func dbSetup() (*mongodm.Model, bool) {
 		})
 		if err != nil {
 			beego.Error(models.UserModelName+" model registration failed: ", err)
-			return nil, false
+			return false
 		}
 
 		_, err = dbm.RegisterModel(&models.UserSession{}, models.UserSessionModelName, models.UserSessionCollectionName, []mgo.Index{
@@ -45,7 +44,7 @@ func dbSetup() (*mongodm.Model, bool) {
 		})
 		if err != nil {
 			beego.Error(models.UserSessionModelName+" model registration failed: ", err)
-			return nil, false
+			return false
 		}
 
 		_, err = dbm.RegisterModel(&models.Company{}, models.CompanyModelName, models.CompanyCollectionName, []mgo.Index{
@@ -58,18 +57,20 @@ func dbSetup() (*mongodm.Model, bool) {
 		})
 		if err != nil {
 			beego.Error(models.CompanyModelName+" model registration failed: ", err)
-			return nil, false
+			return false
 		}
 
-		return userModel, true
+		return true
 	}
 
-	return nil, false
+	return false
 }
 
-func createAdmin(mongoDmModel *mongodm.Model, roleManager RoleManageable) bool {
+func createSuperadmin() bool {
+	db := GetDbManager()
+	User := db.User()
 	user := &models.User{}
-	err, _ := mongoDmModel.New(user)
+	err, _ := User.New(user)
 	if err != nil {
 		beego.Error("Administrator creation failed: ", err)
 		return false
@@ -93,12 +94,100 @@ func createAdmin(mongoDmModel *mongodm.Model, roleManager RoleManageable) bool {
 	user.PasswordSalt = passwordSalt
 	err = user.Save()
 	if err != nil {
-		beego.Error("Administrator creation failed: ", err)
+		beego.Error("Superadmin user creation failed: ", err)
 		return false
 	}
 
-	if !roleManager.Enforcer().AddRoleForUser(user.Email, "administrator") {
+	rm := GetRoleManager()
+
+	superadmin := rm.GetRole(SUPERADMIN)
+	if superadmin == nil {
+		beego.Error("Superadmin role not found: ", err)
+		return false
+	}
+
+	if !rm.AddPermissionForRole(superadmin, "*") {
+		beego.Error("Administrator role permission addiction failed: ", err)
+		return false
+	}
+
+	if !rm.AddRoleForUser(user, superadmin) {
 		beego.Error("Administrator role addiction failed: ", err)
+		return false
+	}
+
+	return true
+}
+
+func createCompanyAdmin() bool {
+	db := GetDbManager()
+
+	User := db.User()
+	user := &models.User{}
+	err, _ := User.New(user)
+	if err != nil {
+		beego.Error("Company administrator creation failed: ", err)
+		return false
+	}
+
+	user.FirstName = "Pippo"
+	user.LastName = "Palmieri"
+	user.Email = "donzauker78@gmail.com"
+	user.Address = &models.Address{
+		Street:  "Viale Gran San Bernardo 17",
+		ZipCode: "11100",
+		City:    "Aosta",
+	}
+	passwordHash, passwordSalt, err := HashAndSalt("password")
+	if err != nil {
+		beego.Error("Company administrator password creation failed: ", err)
+		return false
+	}
+
+	user.PasswordHash = passwordHash
+	user.PasswordSalt = passwordSalt
+	err = user.Save()
+	if err != nil {
+		beego.Error("Company administrator user creation failed: ", err)
+		return false
+	}
+
+	Company := db.Company()
+	company := &models.Company{}
+	err, _ = Company.New(company)
+	if err != nil {
+		beego.Error("Company creation failed: ", err)
+		return false
+	}
+
+	company.Name = "ACME"
+	company.Address = &models.Address{
+		Street:  "Via Chambery 125",
+		ZipCode: "11100",
+		City:    "Aosta",
+	}
+
+	err = company.Save()
+	if err != nil {
+		beego.Error("Company creation failed: ", err)
+		return false
+	}
+
+	rm := GetRoleManager()
+
+	admin := rm.GetRole(ADMIN)
+	if admin == nil {
+		beego.Error("Company admin role not found: ", err)
+		return false
+	}
+
+	if !rm.AddPermissionForRole(ADMIN, "*") {
+		beego.Error("Company admin role permission addiction failed: ", err)
+		return false
+	}
+
+	if !rm.AddRoleForUserInCompany(user, admin, company) {
+		beego.Error("Company admin role addiction failed: ", err)
 		return false
 	}
 
@@ -113,21 +202,23 @@ func AppBootstrap() bool {
 	// Log on file and console
 	logs.SetLogger(logs.AdapterFile, `{"filename":"logs/history.log","level":7,"maxlines":0,"maxsize":0,"daily":true,"maxdays":7}`)
 
-	userModel, state := dbSetup()
-	if !state {
+	if !dbSetup() {
 		return false
 	}
 
 	rm := GetRoleManager()
 	if rm != nil {
-		numUsers, err := userModel.Count()
-		if err != nil {
-			beego.Error("User count failed: ", err)
-			return false
-		}
-		if numUsers == 0 {
-			if createAdmin(userModel, rm) {
+		superadmin := rm.GetRole("superadmin")
+		if len(rm.GetUserIdsForRole(superadmin)) == 0 {
+			if createSuperadmin() {
 				beego.Info("Administrator with default info created")
+			}
+		}
+
+		admin := rm.GetRole("admin")
+		if len(rm.GetUserIdsForRole(admin)) == 0 {
+			if createCompanyAdmin() {
+				beego.Info("Company admin with default info created")
 			}
 		}
 	}

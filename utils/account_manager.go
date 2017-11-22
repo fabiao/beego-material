@@ -16,8 +16,7 @@ const (
 
 func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
 	db := GetDbManager()
-
-	User := db.Connection().Model(models.UserModelName)
+	User := db.User()
 	user := &models.User{}
 	err := User.FindOne(bson.M{"email": login.Email}).Exec(user)
 	if _, ok := err.(*mongodm.NotFoundError); ok {
@@ -47,7 +46,7 @@ func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
 		return "", nil, http.StatusInternalServerError, err
 	}
 
-	UserSession := db.Connection().Model(models.UserSessionModelName)
+	UserSession := db.UserSession()
 	userSession := &models.UserSession{}
 	err, _ = UserSession.New(userSession)
 	if err != nil {
@@ -65,7 +64,7 @@ func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
 
 func Signup(signup models.Signup) (string, *models.SessionUser, int, error) {
 	db := GetDbManager()
-	User := db.Connection().Model(models.UserModelName)
+	User := db.User()
 
 	num, err := User.Find(bson.M{"email": signup.Email}).Count()
 	if err != nil {
@@ -109,8 +108,7 @@ func Signup(signup models.Signup) (string, *models.SessionUser, int, error) {
 
 func Update(updateAccount models.UpdateAccount, userId string) (string, *models.SessionUser, int, error) {
 	db := GetDbManager()
-	User := db.Connection().Model(models.UserModelName)
-
+	User := db.User()
 	user := &models.User{}
 	err := User.FindId(bson.ObjectIdHex(userId)).Exec(user)
 	if err != nil {

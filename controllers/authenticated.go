@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"github.com/fabiao/beego-material/models"
 	"github.com/fabiao/beego-material/utils"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
@@ -40,7 +39,7 @@ func (self *AuthenticatedController) Prepare() {
 	}
 
 	db := utils.GetDbManager()
-	UserSession := db.Connection().Model(models.UserSessionModelName)
+	UserSession := db.UserSession()
 
 	num, err := UserSession.FindOne(bson.M{"userId": bson.ObjectIdHex(userId)}).Count()
 	if err != nil {

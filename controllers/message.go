@@ -1,12 +1,5 @@
 package controllers
 
-import (
-	"github.com/fabiao/beego-material/models"
-	"github.com/fabiao/beego-material/utils"
-	"gopkg.in/mgo.v2/bson"
-	"net/http"
-)
-
 type MessageController struct {
 	BaseController
 }
@@ -102,9 +95,9 @@ type MessageController struct {
  *
 */
 func (self *MessageController) GetAll() {
-	db := utils.GetDbManager()
+	/*db := utils.GetDbManager()
 
-	Message := db.Connection().Model("Message")
+	essage := db.Connection().Model("Message")
 	messages := []*models.Message{}
 
 	query := bson.M{"deleted": false}
@@ -136,7 +129,7 @@ func (self *MessageController) GetAll() {
 
 	self.response.CreatePaging(self.paging.skip, self.paging.take, queryCount, len(messages))
 	self.response.AddContent("messages", messages)
-	self.response.ServeJSON()
+	self.response.ServeJSON()*/
 }
 
 /**
@@ -213,7 +206,7 @@ func (self *MessageController) GetAll() {
 }
 */
 func (self *MessageController) Create() {
-	db := utils.GetDbManager()
+	/*db := utils.GetDbManager()
 
 	Message := db.Connection().Model("Message")
 	message := &models.Message{}
@@ -239,11 +232,11 @@ func (self *MessageController) Create() {
 
 	self.response.AddContent("message", message)
 	self.response.SetStatus(http.StatusCreated)
-	self.response.ServeJSON()
+	self.response.ServeJSON()*/
 }
 
 func (self *MessageController) Update() {
-	db := utils.GetDbManager()
+	/*db := utils.GetDbManager()
 
 	Message := db.Connection().Model("Message")
 	message := &models.Message{}
@@ -268,5 +261,5 @@ func (self *MessageController) Update() {
 
 	self.response.AddContent("message", message)
 	self.response.SetStatus(http.StatusOK)
-	self.response.ServeJSON()
+	self.response.ServeJSON()*/
 }

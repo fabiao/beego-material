@@ -1,7 +1,7 @@
-import { AUTHENTICATED, UNAUTHENTICATED } from '../actions/auth'
+import { AUTHENTICATED, UNAUTHENTICATED, AUTHENTICATION_FAILED } from '../actions/auth'
 
 const initialState = {
-    authenticated: false
+    authenticated: false, error: null
 }
 
 export default function(state = initialState, action) {
@@ -10,6 +10,8 @@ export default function(state = initialState, action) {
             return { ...state, authenticated: true }
         case UNAUTHENTICATED:
             return { ...state, authenticated: false }
+        case AUTHENTICATION_FAILED:
+            return { ...state, error: action.message }
         default:
             break
     }

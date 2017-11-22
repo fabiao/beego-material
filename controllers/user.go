@@ -17,7 +17,7 @@ type UserController struct {
 func (self *UserController) Create() {
 	db := utils.GetDbManager()
 
-	User := db.Connection().Model(models.UserModelName)
+	User := db.User()
 	user := &models.User{}
 
 	// See https://godoc.org/github.com/zebresel-com/mongodm#Model.New
@@ -92,7 +92,7 @@ func (self *UserController) Update() {
 func (self *UserController) GetAll() {
 	db := utils.GetDbManager()
 
-	User := db.Connection().Model(models.UserModelName)
+	User := db.User()
 	users := []*models.User{}
 
 	searchTag := self.GetString("search")
@@ -153,7 +153,7 @@ func (self *UserController) GetAll() {
 func (self *UserController) Get() {
 	db := utils.GetDbManager()
 
-	User := db.Connection().Model(models.UserModelName)
+	User := db.User()
 	user := &models.User{}
 
 	userId, err := self.AuthenticatedController.getUserId()

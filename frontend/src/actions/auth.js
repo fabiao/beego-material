@@ -6,6 +6,7 @@ const { notifSend } = notifActions
 
 export const AUTHENTICATED = 'authenticated_user'
 export const UNAUTHENTICATED = 'unauthenticated_user'
+export const AUTHENTICATION_FAILED = 'authentication_failed'
 
 export const signUpAction = ({ firstName, lastName, email, password, confirmPassword, address }, history) => {
     return (dispatch) => {
@@ -19,6 +20,7 @@ export const signUpAction = ({ firstName, lastName, email, password, confirmPass
                         return
                     }
                     case FetchCode.AUTH_FAILED: {
+                        dispatch({type: AUTHENTICATION_FAILED, message: state.message })
                         dispatch(notifSend({
                             message: state.message,
                             kind: 'warning',
