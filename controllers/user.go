@@ -23,7 +23,7 @@ func (self *UserController) Create() {
 	// See https://godoc.org/github.com/zebresel-com/mongodm#Model.New
 	err, requestMap := User.New(user, self.Ctx.Input.RequestBody)
 	if err != nil {
-		self.response.CustomError(http.StatusBadRequest, 0, err.Error())
+		self.ServeError(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -34,22 +34,24 @@ func (self *UserController) Create() {
 		return
 	 * The default validation will be called automatically within this step.
 	*/
-	if valid, issues := user.Validate(requestMap["password"]); valid {
+	if valid, errors := user.Validate(requestMap["password"]); valid {
 		// See https://godoc.org/github.com/zebresel-com/mongodm#DocumentBase.Save
 		err = user.Save()
 		if err != nil {
 
-			self.response.Error(http.StatusInternalServerError)
+			self.ServeError(http.StatusInternalServerError, err.Error())
 			return
 		}
 	} else {
-		self.response.Error(http.StatusBadRequest, issues)
+		errorStrings := make([]string, len(errors))
+		for i, e := range errors {
+			errorStrings[i] = e.Error()
+		}
+		self.ServeErrors(http.StatusBadRequest, errorStrings)
 		return
 	}
 
-	self.response.AddContent("user", user)
-	self.response.SetStatus(http.StatusCreated)
-	self.response.ServeJSON()
+	self.ServeContent("user", user)
 }
 
 func (self *UserController) Update() {
@@ -59,7 +61,7 @@ func (self *UserController) Update() {
 	valid := validation.Validation{}
 	isValid, err := valid.Valid(&updateAccount)
 	if err != nil {
-		self.response.CustomError(http.StatusInternalServerError, 0, err.Error())
+		self.ServeError(http.StatusInternalServerError, err.Error())
 		return
 	}
 	if !isValid {
@@ -67,26 +69,20 @@ func (self *UserController) Update() {
 		for i, v := range valid.Errors {
 			errors[i] = v.Error()
 		}
-		self.response.Error(http.StatusBadRequest, errors)
+		self.ServeErrors(http.StatusBadRequest, errors)
 		return
 	}
 
-	userId, err := self.getUserId()
+	token, sessionUser, code, err := utils.Update(updateAccount, self.currentUserId)
 	if err != nil {
-		self.response.CustomError(http.StatusUnauthorized, 0, err.Error())
+		self.ServeError(code, err.Error())
 		return
 	}
 
-	token, sessionUser, code, err := utils.Update(updateAccount, userId)
-	if err != nil {
-		self.response.CustomError(code, 0, err.Error())
-		return
-	}
-
-	self.response.AddContent("token", token)
-	self.response.AddContent("user", sessionUser)
-	self.response.SetStatus(http.StatusOK)
-	self.response.ServeJSON()
+	self.ServeContents(map[string]interface{}{
+		"token": token,
+		"user":  sessionUser,
+	})
 }
 
 func (self *UserController) GetAll() {
@@ -130,24 +126,20 @@ func (self *UserController) GetAll() {
 	}
 
 	queryCount, queryErr := User.Find(query).Count()
-
 	if queryErr != nil {
-
-		self.response.Error(http.StatusInternalServerError)
+		self.ServeError(http.StatusInternalServerError, queryErr.Error())
 		return
 	}
 
 	err := User.Find(query).Sort("-createdAt").Skip(self.paging.skip).Limit(self.paging.take).Exec(&users)
 
 	if len(users) > 0 && err != nil {
-		self.response.Error(http.StatusInternalServerError)
+		self.ServeError(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	self.response.CreatePaging(self.paging.skip, self.paging.take, queryCount, len(users))
-	self.response.AddContent(models.UserCollectionName, users)
-	self.response.SetStatus(http.StatusOK)
-	self.response.ServeJSON()
+	self.ServeContent("users", users)
 }
 
 func (self *UserController) Get() {
@@ -156,18 +148,11 @@ func (self *UserController) Get() {
 	User := db.User()
 	user := &models.User{}
 
-	userId, err := self.AuthenticatedController.getUserId()
+	err := User.FindId(bson.ObjectIdHex(self.currentUserId)).Exec(user)
 	if err != nil {
-		self.response.Error(http.StatusInternalServerError, err)
-		return
-	}
-	err = User.FindId(bson.ObjectIdHex(userId)).Exec(user)
-	if err != nil {
-		self.response.Error(http.StatusInternalServerError, err)
+		self.ServeError(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	self.response.AddContent("user", user.SessionUser)
-	self.response.SetStatus(http.StatusOK)
-	self.response.ServeJSON()
+	self.ServeContent("user", user.SessionUser)
 }

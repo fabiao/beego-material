@@ -1,33 +1,48 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 import { connect } from 'react-redux'
+import { push } from 'redux-little-router'
 import PropTypes from 'prop-types'
 
-export default function (ComposedComponent) {
-    class Authentication extends Component {
-        componentWillMount() {
-            if (!this.props.authenticated) {
-                this.props.history.push('/signin')
-            }
-        }
-
-        componentWillUpdate(nextProps) {
-            if (!nextProps.authenticated) {
-                this.props.history.push('/signin')
-            }
-        }
-
-        PropTypes = {
-            router: PropTypes.object,
-        }
-
-        render() {
-            return <ComposedComponent {...this.props} />
+class Authentication extends Component {
+    componentWillMount() {
+        if (!this.props.authenticated) {
+            this.props.dispatch(push('/signin'))
         }
     }
 
-    function mapStateToProps(state) {
-        return { authenticated: state.auth.authenticated }
+    componentWillUpdate(nextProps) {
+        if (!nextProps.authenticated) {
+            this.props.dispatch(push('/signin'))
+        }
     }
 
-    return connect(mapStateToProps)(Authentication)
+    PropTypes = {
+        router: PropTypes.object,
+    }
 }
+
+const mapStateToProps = (state) => {
+    return { authenticated: state.auth.authenticated }
+}
+
+export const Auth = connect(mapStateToProps)(Authentication)
+
+class NoRequireAuthentication extends Component {
+    componentWillMount() {
+        if (this.props.authenticated) {
+            this.props.dispatch(push('/'))
+        }
+    }
+
+    componentWillUpdate(nextProps) {
+        if (nextProps.authenticated) {
+            this.props.dispatch(push('/'))
+        }
+    }
+
+    PropTypes = {
+        router: PropTypes.object,
+    }
+}
+
+export const NoAuth = connect(mapStateToProps)(NoRequireAuthentication)

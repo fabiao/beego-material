@@ -1,17 +1,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Card, CardTitle } from 'react-md'
-import SignupForm from '../components/SignupForm'
+import UserSettingsForm from '../components/UserSettingsForm'
 import { loadUserAction, updateUserAction } from '../actions/user'
+import { Auth } from '../components/Authentication'
 
 
-class UserSettings extends React.Component {
+class UserSettings extends Auth {
     componentDidMount() {
         this.props.loadUserAction()
     }
 
     submit = (values) => {
-        this.props.updateUserAction(values, this.props.history)
+        this.props.updateUserAction(values)
     }
 
     errorMessage() {
@@ -29,7 +30,7 @@ class UserSettings extends React.Component {
         return (
             <Card className="md-block-centered">
                 <CardTitle title="Update" subtitle="Modify your info" />
-                <SignupForm initialValues={user} onSubmit={values => this.submit(values)}/>
+                <UserSettingsForm initialValues={user} onSubmit={values => this.submit(values)}/>
             </Card>
         )
     }

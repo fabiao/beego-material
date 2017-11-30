@@ -21,7 +21,7 @@ type DbManageable interface {
 	RegisterModel(document mongodm.IDocumentBase, modelName string, collectionName string, indexFieldSettings []mgo.Index) (*mongodm.Model, error)
 	User() *mongodm.Model
 	UserSession() *mongodm.Model
-	Company() *mongodm.Model
+	Organization() *mongodm.Model
 }
 
 type DbManager struct {
@@ -95,6 +95,6 @@ func (self *DbManager) UserSession() *mongodm.Model {
 	return self.db.Model(models.UserSessionModelName)
 }
 
-func (self *DbManager) Company() *mongodm.Model {
-	return self.db.Model(models.CompanyModelName)
+func (self *DbManager) Organization() *mongodm.Model {
+	return self.db.Model(models.OrganizationModelName)
 }

@@ -43,7 +43,6 @@ func init() {
 	}
 
 	signBytes, err := ioutil.ReadFile(privKeyPath)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,7 +55,6 @@ func init() {
 
 // GetToken is a function that exposes the method to get a simple token for jwt
 func (e EasyToken) GetToken() (string, error) {
-
 	// Create the Claims
 	claims := &jwt.StandardClaims{
 		IssuedAt:  e.IssuedAt,

@@ -1,25 +1,23 @@
 import React from 'react'
-import { Link as RouterLink, Route } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { Link } from 'redux-little-router'
 import { FontIcon, ListItem } from 'react-md'
 
-const NavLink = ({ label, to, exact, icon }) => (
-    <Route path={to} exact={exact}>
-        {({ match }) => {
-            let leftIcon
-            if (icon) {
-                leftIcon = <FontIcon>{icon}</FontIcon>;
-            }
-            return (
-                <ListItem
-                    component={RouterLink}
-                    active={!!match}
-                    to={to}
-                    primaryText={label}
-                    leftIcon={leftIcon}
-                />
-            )
-        }}
-    </Route>
-)
+const NavLink = ({ label, to, icon, router }) => {
+    let leftIcon = null
+    if (icon) {
+        leftIcon = <FontIcon>{icon}</FontIcon>;
+    }
+    return (
+        <ListItem
+            component={Link}
+            href={to}
+            primaryText={label}
+            active={to === router.route} // router.pathname
+            leftIcon={leftIcon}
+        />
+    )
+}
 
-export default NavLink
+const mapStateToProps = state => ({ router: state.router })
+export default connect(mapStateToProps)(NavLink)

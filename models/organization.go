@@ -5,11 +5,11 @@ import (
 )
 
 const (
-	CompanyModelName      = "Company"
-	CompanyCollectionName = "companies"
+	OrganizationModelName      = "Organization"
+	OrganizationCollectionName = "orgs"
 )
 
-type Company struct {
+type Organization struct {
 	mongodm.DocumentBase `json:",inline" bson:",inline"`
 
 	Name    string   `json:"name" bson:"name" minLen:"1" maxLen:"255" required:"true" valid:"MinSize(1);MaxSize(255)"`

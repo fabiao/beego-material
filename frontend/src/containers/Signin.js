@@ -1,13 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link } from 'redux-little-router'
 import { Card, CardTitle } from 'react-md'
 import SigninForm from '../components/SigninForm'
 import { signInAction } from '../actions/auth'
+import { NoAuth } from '../components/Authentication'
 
-class Signin extends React.Component {
+class Signin extends NoAuth {
     submit = (values) => {
-        this.props.signInAction(values, this.props.history)
+        this.props.signInAction(values)
     }
 
     errorMessage() {
@@ -23,8 +24,8 @@ class Signin extends React.Component {
     render() {
         return (
             <Card className="md-block-centered">
-                <CardTitle title="Login" subtitle={<span>Don't have an account? <Link to="/signup">Sign Up</Link></span>} />
-                <SigninForm onCancel={e => this.props.history.push('/recover-password')} onSubmit={values => this.submit(values)}/>
+                <CardTitle title="Login" subtitle={<span>Don't have an account? <Link href="/signup">Sign Up</Link></span>} />
+                <SigninForm onSubmit={values => this.submit(values)}/>
             </Card>
         )
     }

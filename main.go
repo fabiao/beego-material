@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/astaxie/beego"
-	_ "github.com/fabiao/beego-material/routers" // Routes auto-initializer
+	_ "github.com/fabiao/beego-material/controllers"
 	"github.com/fabiao/beego-material/utils"
 )
 

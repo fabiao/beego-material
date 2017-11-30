@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/fabiao/beego-material/utils"
 	response "github.com/zebresel-com/beego-response"
+	"net/http"
+	"strings"
 )
 
 const DEFAULT_TAKE int = 10
@@ -17,13 +18,11 @@ type paging struct {
 type BaseController struct {
 	beego.Controller
 
-	db       utils.DbManageable
 	response *response.Response
 	paging   paging
 }
 
 func (self *BaseController) Prepare() {
-	self.db = utils.GetDbManager()
 	self.response = response.New(self.Ctx)
 
 	take, takeErr := self.GetInt("take")
@@ -38,4 +37,28 @@ func (self *BaseController) Prepare() {
 
 	self.paging.take = take
 	self.paging.skip = skip
+}
+
+func (self *BaseController) ServeContents(contents map[string]interface{}) {
+	for n, c := range contents {
+		self.response.AddContent(n, c)
+	}
+	self.response.SetStatus(http.StatusOK)
+	self.response.ServeJSON()
+}
+
+func (self *BaseController) ServeContent(contentName string, content interface{}) {
+	self.ServeContents(map[string]interface{}{contentName: content})
+}
+
+func (self *BaseController) ServeError(errorCode int, errorMessage string) {
+	self.response.AddContent("error", errorMessage)
+	self.response.SetStatus(errorCode)
+	self.response.ServeJSON()
+}
+
+func (self *BaseController) ServeErrors(errorCode int, errorMessages []string) {
+	self.response.AddContent("error", strings.Join(errorMessages, "\n"))
+	self.response.SetStatus(errorCode)
+	self.response.ServeJSON()
 }

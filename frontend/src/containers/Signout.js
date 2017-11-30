@@ -1,16 +1,15 @@
-import React from "react"
-import { connect } from "react-redux"
-import { Redirect } from "react-router-dom"
-import {signOutAction} from "../actions/auth"
+import React from 'react'
+import { connect } from 'react-redux'
+import { signOutAction } from '../actions/auth'
 
 class Signout extends React.Component {
     componentWillMount() {
-        signOutAction(this.props.dispatch)
+        this.props.signOutAction()
     }
 
     render() {
-        return (<Redirect to="/" />)
+        return null
     }
 }
 
-export default connect()(Signout)
+export default connect(null, {signOutAction})(Signout)

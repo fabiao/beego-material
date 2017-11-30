@@ -3630,4 +3630,22 @@ body {
 
 .notif__container {
   top: auto !important;
-  bottom: 0px !important; }
+  bottom: 0px !important;
+  text-align: center; }
+
+@media screen and (min-width: 320px) and (min-aspect-ratio: 13 / 9) {
+  .md-toolbar-relative {
+    margin-top: 56px; }
+  .md-toolbar-relative--padding {
+    padding-top: 56px; }
+  .md-toolbar {
+    height: 56px; }
+  .md-toolbar--action-left {
+    margin-left: 4px; }
+  .md-toolbar--action-right {
+    margin-right: 4px; }
+  .md-title--toolbar {
+    line-height: 56px;
+    margin-left: 20px; }
+  .md-title--toolbar-offset {
+    margin-left: 72px; } }

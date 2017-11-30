@@ -47,7 +47,7 @@ func dbSetup() bool {
 			return false
 		}
 
-		_, err = dbm.RegisterModel(&models.Company{}, models.CompanyModelName, models.CompanyCollectionName, []mgo.Index{
+		_, err = dbm.RegisterModel(&models.Organization{}, models.OrganizationModelName, models.OrganizationCollectionName, []mgo.Index{
 			{
 				Key:        []string{"name"},
 				Unique:     true,
@@ -56,7 +56,7 @@ func dbSetup() bool {
 			},
 		})
 		if err != nil {
-			beego.Error(models.CompanyModelName+" model registration failed: ", err)
+			beego.Error(models.OrganizationModelName+" model registration failed: ", err)
 			return false
 		}
 
@@ -100,18 +100,12 @@ func createSuperadmin() bool {
 
 	rm := GetRoleManager()
 
-	superadmin := rm.GetRole(SUPERADMIN)
-	if superadmin == nil {
-		beego.Error("Superadmin role not found: ", err)
-		return false
-	}
-
-	if !rm.AddPermissionForRole(superadmin, "*") {
+	if !rm.E().AddPermissionForUser(SUPERADMIN, "*", "/*", "*") {
 		beego.Error("Administrator role permission addiction failed: ", err)
 		return false
 	}
 
-	if !rm.AddRoleForUser(user, superadmin) {
+	if !rm.E().AddRoleForUserInDomain(user.Id.Hex(), SUPERADMIN, "*") {
 		beego.Error("Administrator role addiction failed: ", err)
 		return false
 	}
@@ -119,14 +113,14 @@ func createSuperadmin() bool {
 	return true
 }
 
-func createCompanyAdmin() bool {
+func createOrganizationAdmin() bool {
 	db := GetDbManager()
 
 	User := db.User()
 	user := &models.User{}
 	err, _ := User.New(user)
 	if err != nil {
-		beego.Error("Company administrator creation failed: ", err)
+		beego.Error("Organization administrator creation failed: ", err)
 		return false
 	}
 
@@ -140,7 +134,7 @@ func createCompanyAdmin() bool {
 	}
 	passwordHash, passwordSalt, err := HashAndSalt("password")
 	if err != nil {
-		beego.Error("Company administrator password creation failed: ", err)
+		beego.Error("Organization administrator password creation failed: ", err)
 		return false
 	}
 
@@ -148,46 +142,44 @@ func createCompanyAdmin() bool {
 	user.PasswordSalt = passwordSalt
 	err = user.Save()
 	if err != nil {
-		beego.Error("Company administrator user creation failed: ", err)
+		beego.Error("Organization administrator user creation failed: ", err)
 		return false
 	}
 
-	Company := db.Company()
-	company := &models.Company{}
-	err, _ = Company.New(company)
+	Organization := db.Organization()
+	org := &models.Organization{}
+	err, _ = Organization.New(org)
 	if err != nil {
-		beego.Error("Company creation failed: ", err)
+		beego.Error("Organization creation failed: ", err)
 		return false
 	}
 
-	company.Name = "ACME"
-	company.Address = &models.Address{
+	org.Name = "ACME"
+	org.Address = &models.Address{
 		Street:  "Via Chambery 125",
 		ZipCode: "11100",
 		City:    "Aosta",
 	}
 
-	err = company.Save()
+	err = org.Save()
 	if err != nil {
-		beego.Error("Company creation failed: ", err)
+		beego.Error("Organization creation failed: ", err)
 		return false
 	}
 
 	rm := GetRoleManager()
 
-	admin := rm.GetRole(ADMIN)
-	if admin == nil {
-		beego.Error("Company admin role not found: ", err)
+	/*p,org_admin,orgId,/orgs/:orgId*,*
+	p,org_editor,orgId,/orgs/:orgId/activities*,*
+	p,org_viewer,orgId,/orgs/:orgId/reports*,read*/
+
+	if !rm.E().AddPermissionForUser(ORG_ADMIN, org.Id.Hex(), "/orgs/:orgId*", "*") {
+		beego.Error("Organization admin role permission addiction failed: ", err)
 		return false
 	}
 
-	if !rm.AddPermissionForRole(ADMIN, "*") {
-		beego.Error("Company admin role permission addiction failed: ", err)
-		return false
-	}
-
-	if !rm.AddRoleForUserInCompany(user, admin, company) {
-		beego.Error("Company admin role addiction failed: ", err)
+	if !rm.E().AddRoleForUserInDomain(user.Id.Hex(), ORG_ADMIN, org.Id.Hex()) {
+		beego.Error("Organization admin role addiction failed: ", err)
 		return false
 	}
 
@@ -208,17 +200,15 @@ func AppBootstrap() bool {
 
 	rm := GetRoleManager()
 	if rm != nil {
-		superadmin := rm.GetRole("superadmin")
-		if len(rm.GetUserIdsForRole(superadmin)) == 0 {
+		if len(rm.E().GetUsersForRole(SUPERADMIN)) == 0 {
 			if createSuperadmin() {
 				beego.Info("Administrator with default info created")
 			}
 		}
 
-		admin := rm.GetRole("admin")
-		if len(rm.GetUserIdsForRole(admin)) == 0 {
-			if createCompanyAdmin() {
-				beego.Info("Company admin with default info created")
+		if len(rm.E().GetUsersForRole(ORG_ADMIN)) == 0 {
+			if createOrganizationAdmin() {
+				beego.Info("Organization admin with default info created")
 			}
 		}
 	}

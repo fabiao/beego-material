@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 import { Card, CardTitle } from 'react-md'
 import SignupForm from '../components/SignupForm'
 import { signUpAction } from '../actions/auth'
+import { NoAuth } from '../components/Authentication'
 
-class Signup extends React.Component {
+class Signup extends NoAuth {
     submit = (values) => {
-        this.props.signUpAction(values, this.props.history)
+        this.props.signUpAction(values)
     }
 
     errorMessage() {

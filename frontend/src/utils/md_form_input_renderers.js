@@ -1,19 +1,21 @@
 import React from 'react'
 import { TextField, Checkbox, SelectionControlGroup, SelectField, Switch } from 'react-md'
 
-export const renderMdTextField = ({ input, label, meta: { touched, error }, ...custom }) => {
-    return (
-        <TextField
-            id={input.name}
-            label={label}
-            value={input.value}
-            {...custom}
-            error={error}
-            errorText={error}
-            onChange={input.onChange}
-        />
-    )
-}
+export const renderMdTextField = ({ input, meta: { touched, error }, ...others }) => (
+    <TextField {...input} {...others} error={touched && !!error} errorText={error} />
+)
+/*export const renderMdTextField = ({ input, label, type, meta: { touched, error, warning }, ...custom }) => (
+    <TextField
+        id={input.name}
+        type={type}
+        label={label}
+        value={input.value}
+        {...custom}
+        error={error}
+        errorText={error}
+        onChange={input.onChange}
+    />
+)*/
 
 export const renderMdCheckBox = ({ input, label, meta: { touched, error }, ...custom }) => (
     <Checkbox

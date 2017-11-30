@@ -14,24 +14,8 @@ const (
 	SESSION_TOKEN_EXPIRATION_TIME_MINS = 60
 )
 
-func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
+func RefreshUserSession(user *models.User) (string, *models.SessionUser, int, error) {
 	db := GetDbManager()
-	User := db.User()
-	user := &models.User{}
-	err := User.FindOne(bson.M{"email": login.Email}).Exec(user)
-	if _, ok := err.(*mongodm.NotFoundError); ok {
-		return "", nil, http.StatusUnauthorized, err
-	} else if err != nil {
-		return "", nil, http.StatusInternalServerError, err
-	}
-
-	verified, err := VerifyHash(login.Password, user.PasswordHash, user.PasswordSalt)
-	if err != nil {
-		return "", nil, http.StatusUnauthorized, err
-	} else if !verified {
-		return "", nil, http.StatusUnauthorized, errors.New("Unauthorized user")
-	}
-
 	timeFunc := jwt.TimeFunc()
 	now := timeFunc.Unix()
 	expiration := timeFunc.Add(time.Minute * SESSION_TOKEN_EXPIRATION_TIME_MINS).Unix()
@@ -60,6 +44,27 @@ func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
 	}
 
 	return token, &user.SessionUser, http.StatusOK, nil
+}
+
+func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
+	db := GetDbManager()
+	User := db.User()
+	user := &models.User{}
+	err := User.FindOne(bson.M{"email": login.Email}).Exec(user)
+	if _, ok := err.(*mongodm.NotFoundError); ok {
+		return "", nil, http.StatusUnauthorized, err
+	} else if err != nil {
+		return "", nil, http.StatusInternalServerError, err
+	}
+
+	verified, err := VerifyHash(login.Password, user.PasswordHash, user.PasswordSalt)
+	if err != nil {
+		return "", nil, http.StatusUnauthorized, err
+	} else if !verified {
+		return "", nil, http.StatusUnauthorized, errors.New("Unauthorized user")
+	}
+
+	return RefreshUserSession(user)
 }
 
 func Signup(signup models.Signup) (string, *models.SessionUser, int, error) {
@@ -98,7 +103,7 @@ func Signup(signup models.Signup) (string, *models.SessionUser, int, error) {
 		return "", nil, http.StatusInternalServerError, err
 	}
 
-	token, sessionUser, code, err := Signin(models.Signin{signup.Email, signup.Password})
+	token, sessionUser, code, err := RefreshUserSession(user)
 	if err != nil {
 		return "", nil, code, err
 	}
@@ -149,7 +154,7 @@ func Update(updateAccount models.UpdateAccount, userId string) (string, *models.
 		return "", nil, http.StatusInternalServerError, err
 	}
 
-	token, sessionUser, code, err := Signin(models.Signin{updateAccount.Email, updateAccount.Password})
+	token, sessionUser, code, err := RefreshUserSession(user)
 	if err != nil {
 		return "", nil, code, err
 	}

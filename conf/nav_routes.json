@@ -1,0 +1,63 @@
+[
+  {
+    "keys": ["/", "/orgs", "/users", "/activities", "/reports", "/user-settings"],
+    "values": [
+      {
+        "to": "/",
+        "label": "Home",
+        "icon": "home"
+      },
+      {
+        "to": "/orgs",
+        "label": "Organizations",
+        "icon": "domain"
+      },
+      {
+        "to": "/users",
+        "label": "Users",
+        "icon": "people"
+      },
+      {
+        "to": "/activities",
+        "label": "Activities",
+        "icon": "perm_contact_calendar"
+      },
+      {
+        "to": "/reports",
+        "label": "Reports",
+        "icon": "event"
+      }
+    ]
+  },
+  {
+    "keys": ["/orgs/:orgId", "/orgs/:orgId/users", "/orgs/:orgId/activities", "/orgs/:orgId/reports"],
+    "values": [
+      {
+        "to": "/",
+        "label": "Back",
+        "icon": "keyboard_arrow_left",
+        "isBackward": true
+      },
+      {
+        "to": "/orgs/:orgId",
+        "label": "Settings",
+        "icon": "domain"
+      },
+      {
+        "to": "/orgs/:orgId/users",
+        "label": "Users",
+        "icon": "people"
+      },
+      {
+        "to": "/orgs/:orgId/activities",
+        "label": "Activities",
+        "icon": "perm_contact_calendar"
+      },
+      {
+        "to": "/orgs/:orgId/reports",
+        "label": "Reports",
+        "icon": "event"
+      }
+    ]
+  }
+]

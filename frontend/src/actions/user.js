@@ -23,7 +23,7 @@ export const loadUserAction = () => {
                             kind: 'warning',
                             dismissAfter: 20000
                         }))
-                        signOutAction(dispatch)
+                        dispatch(signOutAction())
                         break
                     }
                     default: {
@@ -60,7 +60,7 @@ export const updateUserAction = ({ firstName, lastName, email, password, confirm
                             kind: 'warning',
                             dismissAfter: 20000
                         }))
-                        signOutAction(dispatch)
+                        dispatch(signOutAction())
                         break
                     }
                     default: {

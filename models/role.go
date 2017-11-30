@@ -1,11 +1,13 @@
 package models
 
 type Route struct {
-	Path string `json:"path" bson:"path"`
-	Icon string `json:"icon" bson:"icon"`
+	To         string `json:"to"`
+	Label      string `json:"label"`
+	Icon       string `json:"icon"`
+	IsBackward bool   `json:"isBackward"`
 }
 
-type Role struct {
-	Name   string  `json:"name" bson:"name"`
-	Routes []Route `json:"routes" bson:"routes"`
+type RouteBinding struct {
+	Keys   []string `json:"keys"`
+	Values []Route  `json:"values"`
 }

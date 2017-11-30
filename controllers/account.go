@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/fabiao/beego-material/models"
 	"github.com/fabiao/beego-material/utils"
-	"net/http"
 )
 
 type AccountController struct {
@@ -17,14 +16,14 @@ func (self *AccountController) Signin() {
 
 	token, user, code, err := utils.Signin(signin)
 	if err != nil {
-		self.response.CustomError(code, 0, err.Error())
+		self.ServeError(code, err.Error())
 		return
 	}
 
-	self.response.AddContent("token", token)
-	self.response.AddContent("user", user)
-	self.response.SetStatus(http.StatusOK)
-	self.response.ServeJSON()
+	self.ServeContents(map[string]interface{}{
+		"token": token,
+		"user":  user,
+	})
 }
 
 func (self *AccountController) Signup() {
@@ -33,12 +32,19 @@ func (self *AccountController) Signup() {
 
 	token, user, code, err := utils.Signup(signup)
 	if err != nil {
-		self.response.CustomError(code, 0, err.Error())
+		self.ServeError(code, err.Error())
 		return
 	}
 
-	self.response.AddContent("token", token)
-	self.response.AddContent("user", user)
-	self.response.SetStatus(http.StatusOK)
-	self.response.ServeJSON()
+	self.ServeContents(map[string]interface{}{
+		"token": token,
+		"user":  user,
+	})
+}
+
+
+func (self *AccountController) GetRouteBindings() {
+	rc := utils.GetRouteChecker()
+	routeBindings := rc.GetRouteBindings()
+	self.ServeContent("routeBindings", routeBindings)
 }
