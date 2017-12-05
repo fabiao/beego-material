@@ -10,7 +10,7 @@ export const USER_UPDATED = 'user_updated'
 
 export const loadUserAction = () => {
     return async (dispatch) => {
-        getAuth('/user')
+        getAuth('/users/current')
             .then(state => {
                 switch(state.name) {
                     case FetchCode.SUCCESS: {
@@ -41,7 +41,7 @@ export const loadUserAction = () => {
 
 export const updateUserAction = ({ firstName, lastName, email, password, confirmPassword, address }) => {
     return async (dispatch) => {
-        putAuth('/user', { firstName, lastName, email, password, confirmPassword, address })
+        putAuth('/users/current', { firstName, lastName, email, password, confirmPassword, address })
             .then(state => {
                 switch(state.name) {
                     case FetchCode.SUCCESS: {

@@ -14,66 +14,145 @@ type UserController struct {
 	AuthenticatedController
 }
 
-func (self *UserController) Create() {
-	db := utils.GetDbManager()
-
-	User := db.User()
-	user := &models.User{}
-
-	// See https://godoc.org/github.com/zebresel-com/mongodm#Model.New
-	err, requestMap := User.New(user, self.Ctx.Input.RequestBody)
+func (self *UserController) Get() {
+	var userId string
+	err := self.Ctx.Input.Bind(&userId, "userId")
 	if err != nil {
 		self.ServeError(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	/**
-	 * Use a custom validation for the field password.err, requestMap := User.New(user, self.Ctx.Input.RequestBody)
-	if err != nil {
-		self.minlen(http.StatusBadRequest, err)
-		return
-	 * The default validation will be called automatically within this step.
-	*/
-	if valid, errors := user.Validate(requestMap["password"]); valid {
-		// See https://godoc.org/github.com/zebresel-com/mongodm#DocumentBase.Save
-		err = user.Save()
-		if err != nil {
+	db := utils.GetDbManager()
 
-			self.ServeError(http.StatusInternalServerError, err.Error())
-			return
-		}
-	} else {
-		errorStrings := make([]string, len(errors))
-		for i, e := range errors {
-			errorStrings[i] = e.Error()
-		}
-		self.ServeErrors(http.StatusBadRequest, errorStrings)
+	User := db.User()
+	user := &models.User{}
+	err = User.FindId(bson.ObjectIdHex(userId)).Exec(user)
+	if err != nil {
+		self.ServeError(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	self.ServeContent("user", user)
+	updatedUser := models.UpdatedUser{
+		user.Id,
+		user.FirstName,
+		user.LastName,
+		user.Email,
+		user.Address,
+	}
+
+	self.ServeContent("user", updatedUser)
 }
 
-func (self *UserController) Update() {
-	var updateAccount models.UpdateAccount
-	json.Unmarshal(self.Ctx.Input.RequestBody, &updateAccount)
+func (self *UserController) Create() {
+	var model models.Signup
+	err := json.Unmarshal(self.Ctx.Input.RequestBody, &model)
+	if err != nil {
+		self.ServeError(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	valid := validation.Validation{}
-	isValid, err := valid.Valid(&updateAccount)
+	isValid, err := valid.Valid(&model)
 	if err != nil {
 		self.ServeError(http.StatusInternalServerError, err.Error())
 		return
 	}
 	if !isValid {
-		errors := make([]string, len(valid.Errors))
-		for i, v := range valid.Errors {
-			errors[i] = v.Error()
-		}
-		self.ServeErrors(http.StatusBadRequest, errors)
+		self.ServeErrors(http.StatusBadRequest, utils.ToValidationErrorStrings(valid.Errors))
 		return
 	}
 
-	token, sessionUser, code, err := utils.Update(updateAccount, self.currentUserId)
+	db := utils.GetDbManager()
+	User := db.User()
+	user := &models.User{}
+	err, _ = User.New(user)
+	if err != nil {
+		self.ServeError(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	code, err := utils.UpdateModelToUser(user, model.FirstName, model.LastName, model.Email, model.Password, model.ConfirmPassword, model.Address)
+	if err != nil {
+		self.ServeError(code, err.Error())
+		return
+	}
+
+	updatedUser := models.UpdatedUser{
+		user.Id,
+		user.FirstName,
+		user.LastName,
+		user.Email,
+		user.Address,
+	}
+
+	self.ServeContent("user", updatedUser)
+}
+
+func (self *UserController) Update() {
+	var model models.UserToUpdate
+	err := json.Unmarshal(self.Ctx.Input.RequestBody, &model)
+	if err != nil {
+		self.ServeError(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	valid := validation.Validation{}
+	isValid, err := valid.Valid(&model)
+	if err != nil {
+		self.ServeError(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if !isValid {
+		self.ServeErrors(http.StatusBadRequest, utils.ToValidationErrorStrings(valid.Errors))
+		return
+	}
+
+	db := utils.GetDbManager()
+	User := db.User()
+	user := &models.User{}
+	err = User.FindId(model.Id).Exec(user)
+	if err != nil {
+		self.ServeError(http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	code, err := utils.UpdateModelToUser(user, model.FirstName, model.LastName, model.Email, model.Password, model.ConfirmPassword, model.Address)
+	if err != nil {
+		self.ServeError(code, err.Error())
+		return
+	}
+
+	updatedUser := models.UpdatedUser{
+		user.Id,
+		user.FirstName,
+		user.LastName,
+		user.Email,
+		user.Address,
+	}
+
+	self.ServeContent("user", updatedUser)
+}
+
+func (self *UserController) UpdateCurrent() {
+	var model models.Signup
+	err := json.Unmarshal(self.Ctx.Input.RequestBody, &model)
+	if err != nil {
+		self.ServeError(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	valid := validation.Validation{}
+	isValid, err := valid.Valid(&model)
+	if err != nil {
+		self.ServeError(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if !isValid {
+		self.ServeErrors(http.StatusBadRequest, utils.ToValidationErrorStrings(valid.Errors))
+		return
+	}
+
+	token, sessionUser, code, err := utils.UpdateAccount(model, self.currentUserId)
 	if err != nil {
 		self.ServeError(code, err.Error())
 		return
@@ -85,7 +164,7 @@ func (self *UserController) Update() {
 	})
 }
 
-func (self *UserController) GetAll() {
+func (self *UserController) GetAny() {
 	db := utils.GetDbManager()
 
 	User := db.User()
@@ -131,18 +210,18 @@ func (self *UserController) GetAll() {
 		return
 	}
 
-	err := User.Find(query).Sort("-createdAt").Skip(self.paging.skip).Limit(self.paging.take).Exec(&users)
+	err := User.Find(query).Sort("-createdAt").Skip(self.paging.skip).Limit(self.paging.limit).Exec(&users)
 
 	if len(users) > 0 && err != nil {
 		self.ServeError(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	self.response.CreatePaging(self.paging.skip, self.paging.take, queryCount, len(users))
+	self.response.CreatePaging(self.paging.skip, self.paging.limit, queryCount, len(users))
 	self.ServeContent("users", users)
 }
 
-func (self *UserController) Get() {
+func (self *UserController) GetCurrent() {
 	db := utils.GetDbManager()
 
 	User := db.User()
@@ -154,5 +233,5 @@ func (self *UserController) Get() {
 		return
 	}
 
-	self.ServeContent("user", user.SessionUser)
+	self.ServeContent("user", user.BaseUser)
 }

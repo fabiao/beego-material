@@ -13,7 +13,7 @@ import { loadUserAction } from '../actions/user'
 
 import './AccountMenu.css'
 
-class AccountMenu extends React.Component {
+class AccountMenu extends React.PureComponent {
     componentDidMount() {
         if (this.props.authenticated && this.props.user == null) {
             this.props.loadUserAction()

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { signOutAction } from '../actions/auth'
 
-class Signout extends React.Component {
+class Signout extends React.PureComponent {
     componentWillMount() {
         this.props.signOutAction()
     }

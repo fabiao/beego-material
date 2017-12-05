@@ -30,18 +30,18 @@ const validate = values => {
     if (!values.confirmPassword) {
         errors.confirmPassword = 'Required'
     } else if (values.confirmPassword.length < 8 || values.confirmPassword.length > 255) {
-        errors.password = 'Must be more then 8 characters and less then 255 characters'
+        errors.confirmPassword = 'Must be more then 8 characters and less then 255 characters'
     } else if (values.confirmPassword !== values.password) {
         errors.confirmPassword = 'Password don\'t match'
     }
     if (values.address != null) {
-        if (values.address.street.length > 255) {
+        if (values.address.street != null && values.address.street.length > 255) {
             errors.address.street = 'Must be 255 characters or less'
         }
-        if (values.address.city.length > 255) {
+        if (values.address.city != null && values.address.city.length > 255) {
             errors.address.city = 'Must be 255 characters or less'
         }
-        if (values.address.zipCode.length > 255) {
+        if (values.address.zipCode != null && values.address.zipCode.length > 255) {
             errors.address.zipCode = 'Must be 255 characters or less'
         }
     }
@@ -54,50 +54,55 @@ const SignupForm = ({ handleSubmit, initialValues, pristine, reset, submitting }
             id="firstName"
             name="firstName"
             type="text"
-            placeholder="First name"
+            label="First name"
             className="md-cell md-cell--6"
             component={renderMdTextField}
+            required
         />
         <Field
             id="lastName"
             name="lastName"
             type="text"
-            placeholder="Last name"
+            label="Last name"
             className="md-cell md-cell--6"
             component={renderMdTextField}
+            required
         />
         <Field
             id="email"
             name="email"
             type="email"
-            placeholder="Email"
+            label="Email"
             className="md-cell md-cell--4"
             component={renderMdTextField}
             leftIcon={<FontIcon>mail_outline</FontIcon>}
+            required
         />
         <Field
             id="password"
             name="password"
             type="password"
-            placeholder="Password"
+            label="Password"
             className="md-cell md-cell--4"
             component={renderMdTextField}
             leftIcon={<FontIcon>lock</FontIcon>}
+            required
         />
         <Field
             id="confirmPassword"
             name="confirmPassword"
             type="password"
-            placeholder="Confirm password"
+            label="Confirm password"
             className="md-cell md-cell--4"
             component={renderMdTextField}
             leftIcon={<FontIcon>lock</FontIcon>}
+            required
         />
         <Field
             id="street"
             name="address.street"
             type="text"
-            placeholder="Street"
+            label="Street"
             className="md-cell md-cell--4"
             component={renderMdTextField}
         />
@@ -105,7 +110,7 @@ const SignupForm = ({ handleSubmit, initialValues, pristine, reset, submitting }
             id="city"
             name="address.city"
             type="text"
-            placeholder="City"
+            label="City"
             className="md-cell md-cell--4"
             component={renderMdTextField}
         />
@@ -113,7 +118,7 @@ const SignupForm = ({ handleSubmit, initialValues, pristine, reset, submitting }
             id="zipCode"
             name="address.zipCode"
             type="text"
-            placeholder="Zip code"
+            label="Zip code"
             className="md-cell md-cell--4"
             component={renderMdTextField}
         />

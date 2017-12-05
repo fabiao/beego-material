@@ -1,9 +1,9 @@
-import { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { push } from 'redux-little-router'
 import PropTypes from 'prop-types'
 
-class Authentication extends Component {
+class Authentication extends React.PureComponent {
     componentWillMount() {
         if (!this.props.authenticated) {
             this.props.dispatch(push('/signin'))
@@ -27,7 +27,7 @@ const mapStateToProps = (state) => {
 
 export const Auth = connect(mapStateToProps)(Authentication)
 
-class NoRequireAuthentication extends Component {
+class NoRequireAuthentication extends React.PureComponent {
     componentWillMount() {
         if (this.props.authenticated) {
             this.props.dispatch(push('/'))

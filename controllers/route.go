@@ -28,20 +28,28 @@ func init() {
 	}
 
 	// Auth namespaces
-	beego.InsertFilter("/user/*", beego.BeforeRouter, FilterAuthenticated)
-	userNS := beego.NewNamespace("/user",
-		beego.NSRouter("/all", &UserController{}, "get:GetAll"),
+	beego.InsertFilter("/users/*", beego.BeforeRouter, FilterAuthenticated)
+	ns := beego.NewNamespace("/users",
+		beego.NSRouter("/", &UserController{}, "get:GetAny;post:Create;put:Update"),
+		beego.NSRouter("/:userId", &UserController{}, "get:Get"),
+		beego.NSRouter("/current", &UserController{}, "get:GetCurrent;put:UpdateCurrent"),
 		beego.NSRouter("/allowedPaths", &RouteController{}, "get:GetAllowedPaths"),
-		beego.NSRouter("/", &UserController{}, "get:Get;post:Create;put:Update"),
 	)
-	beego.AddNamespace(userNS)
+	beego.AddNamespace(ns)
 
-	beego.InsertFilter("/message/*", beego.BeforeRouter, FilterAuthenticated)
-	messageNS := beego.NewNamespace("/message",
-		beego.NSRouter("/", &MessageController{}, "get:GetAll;post:Create;put:Update"),
+	beego.InsertFilter("/orgs/*", beego.BeforeRouter, FilterAuthenticated)
+	ns = beego.NewNamespace("/orgs",
+		beego.NSRouter("/", &OrganizationController{}, "get:GetAny;post:Create;put:Update"),
+		beego.NSRouter("/:orgId", &OrganizationController{}, "get:Get"),
+	)
+	beego.AddNamespace(ns)
+
+	/*beego.InsertFilter("/message/*", beego.BeforeRouter, FilterAuthenticated)
+	ns = beego.NewNamespace("/message",
+		beego.NSRouter("/", &MessageController{}, "get:GetAny;post:Create;put:UpdateUser"),
 		beego.NSRouter("/:id", &MessageController{}, "get:Get"),
 	)
-	beego.AddNamespace(messageNS)
+	beego.AddNamespace(ns)*/
 
 	// Public routes
 	beego.Router("/signin", &AccountController{}, "post:Signin")

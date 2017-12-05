@@ -30,11 +30,11 @@ if (checkUserAuthenticated()) {
     updateAuthRequestToken(getToken())
 }
 
-register()
-
 ReactDOM.render(
     <Provider store={store}>
         <App />
     </Provider>,
     document.getElementById('root')
 )
+
+register()

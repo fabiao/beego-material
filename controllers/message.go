@@ -94,7 +94,7 @@ type MessageController struct {
 }
  *
 */
-func (self *MessageController) GetAll() {
+func (self *MessageController) GetAny() {
 	/*db := utils.GetDbManager()
 
 	essage := db.Connection().Model("Message")

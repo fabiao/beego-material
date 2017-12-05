@@ -7,7 +7,7 @@ import { Notifs } from 'redux-notifications'
 import {loadRouteBindingsAction} from '../actions/route'
 import 'redux-notifications/lib/styles.css'
 
-class UserNavigationDrawer extends React.Component {
+class UserNavigationDrawer extends React.PureComponent {
     constructor(props) {
         super(props)
         this.state = {

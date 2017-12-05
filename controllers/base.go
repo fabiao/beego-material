@@ -1,18 +1,21 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
-	response "github.com/zebresel-com/beego-response"
 	"net/http"
 	"strings"
+
+	"github.com/astaxie/beego"
+	response "github.com/zebresel-com/beego-response"
 )
 
-const DEFAULT_TAKE int = 10
-const DEFAULT_SKIP int = 0
+const DEFAULT_SKIP int = 10
+const DEFAULT_LIMIT int = 0
 
 type paging struct {
-	skip int
-	take int
+	skip        int
+	limit       int
+	searchField string
+	searchValue string
 }
 
 type BaseController struct {
@@ -25,18 +28,20 @@ type BaseController struct {
 func (self *BaseController) Prepare() {
 	self.response = response.New(self.Ctx)
 
-	take, takeErr := self.GetInt("take")
-	if takeErr != nil || take < 0 {
-		take = DEFAULT_TAKE
-	}
-
-	skip, skipErr := self.GetInt("skip")
-	if skipErr != nil || skip < 0 {
+	skip, err := self.GetInt("skip")
+	if err != nil || skip < 0 {
 		skip = DEFAULT_SKIP
 	}
 
-	self.paging.take = take
+	limit, err := self.GetInt("limit")
+	if err != nil || limit < 0 {
+		limit = DEFAULT_LIMIT
+	}
+
 	self.paging.skip = skip
+	self.paging.limit = limit
+	self.paging.searchField = self.GetString("searchField")
+	self.paging.searchValue = self.GetString("searchValue")
 }
 
 func (self *BaseController) ServeContents(contents map[string]interface{}) {

@@ -7,6 +7,7 @@ import Signin from './containers/Signin'
 import Signup from './containers/Signup'
 import Signout from './containers/Signout'
 import UserSettings from './containers/UserSettings'
+import Organizations from './containers/Organizations'
 
 let NoMatch = ({ router }) => (
     <div>
@@ -20,7 +21,7 @@ const mapStateToProps = (state) => {
 
 NoMatch = connect(mapStateToProps)(NoMatch)
 
-class App extends React.Component {
+export default class App extends React.PureComponent {
     routeBindingsToNavItems = (routeBindings) => {
         if (routeBindings.length > 0) {
             for (let i in routeBindings) {
@@ -52,11 +53,10 @@ class App extends React.Component {
                     <Fragment forRoute='/signin'><Signin/></Fragment>
                     <Fragment forRoute='/signout'><Signout/></Fragment>
                     <Fragment forRoute='/user-settings'><UserSettings/></Fragment>
+                    <Fragment forRoute='/orgs'><Organizations/></Fragment>
                     <Fragment forNoMatch><NoMatch/></Fragment>
                 </UserNavigationDrawer>
             </Fragment>
         )
     }
 }
-
-export default App

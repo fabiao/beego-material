@@ -14,7 +14,7 @@ const (
 	SESSION_TOKEN_EXPIRATION_TIME_MINS = 60
 )
 
-func RefreshUserSession(user *models.User) (string, *models.SessionUser, int, error) {
+func RefreshUserSession(user *models.User) (string, *models.BaseUser, int, error) {
 	db := GetDbManager()
 	timeFunc := jwt.TimeFunc()
 	now := timeFunc.Unix()
@@ -43,10 +43,10 @@ func RefreshUserSession(user *models.User) (string, *models.SessionUser, int, er
 		return "", nil, http.StatusInternalServerError, err
 	}
 
-	return token, &user.SessionUser, http.StatusOK, nil
+	return token, &user.BaseUser, http.StatusOK, nil
 }
 
-func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
+func Signin(login models.Signin) (string, *models.BaseUser, int, error) {
 	db := GetDbManager()
 	User := db.User()
 	user := &models.User{}
@@ -67,40 +67,52 @@ func Signin(login models.Signin) (string, *models.SessionUser, int, error) {
 	return RefreshUserSession(user)
 }
 
-func Signup(signup models.Signup) (string, *models.SessionUser, int, error) {
+func UpdateModelToUser(user *models.User, firstName string, lastName string, email string, password string, confirmPassword string, address *models.Address) (int, error) {
 	db := GetDbManager()
 	User := db.User()
 
-	num, err := User.Find(bson.M{"email": signup.Email}).Count()
+	num, err := User.Find(bson.M{"email": email}).Count()
 	if err != nil {
-		return "", nil, http.StatusInternalServerError, err
+		return http.StatusInternalServerError, err
 	} else if num > 0 {
-		return "", nil, http.StatusInternalServerError, errors.New("Email already used by other user")
+		return http.StatusInternalServerError, errors.New("Email already used by other user")
 	}
 
-	if signup.Password != signup.ConfirmPassword {
-		return "", nil, http.StatusInternalServerError, errors.New("Password confirmation don't match")
+	if password != confirmPassword {
+		return http.StatusInternalServerError, errors.New("Password confirmation don't match")
 	}
 
-	passwordHash, passwordSalt, err := HashAndSalt(signup.Password)
+	passwordHash, passwordSalt, err := HashAndSalt(password)
 	if err != nil {
-		return "", nil, http.StatusInternalServerError, err
+		return http.StatusInternalServerError, err
 	}
 
-	user := &models.User{}
-	err, _ = User.New(user)
-	if err != nil {
-		return "", nil, http.StatusInternalServerError, err
-	}
-	user.FirstName = signup.FirstName
-	user.LastName = signup.LastName
-	user.Email = signup.Email
-	user.Address = signup.Address
+	user.FirstName = firstName
+	user.LastName = lastName
+	user.Email = email
+	user.Address = address
 	user.PasswordHash = passwordHash
 	user.PasswordSalt = passwordSalt
 	err = user.Save()
 	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
+
+func Signup(model models.Signup) (string, *models.BaseUser, int, error) {
+	db := GetDbManager()
+	User := db.User()
+	user := &models.User{}
+	err, _ := User.New(user)
+	if err != nil {
 		return "", nil, http.StatusInternalServerError, err
+	}
+
+	code, err := UpdateModelToUser(user, model.FirstName, model.LastName, model.Email, model.Password, model.ConfirmPassword, model.Address)
+	if err != nil {
+		return "", nil, code, err
 	}
 
 	token, sessionUser, code, err := RefreshUserSession(user)
@@ -111,7 +123,7 @@ func Signup(signup models.Signup) (string, *models.SessionUser, int, error) {
 	return token, sessionUser, http.StatusOK, nil
 }
 
-func Update(updateAccount models.UpdateAccount, userId string) (string, *models.SessionUser, int, error) {
+func UpdateAccount(model models.Signup, userId string) (string, *models.BaseUser, int, error) {
 	db := GetDbManager()
 	User := db.User()
 	user := &models.User{}
@@ -120,38 +132,9 @@ func Update(updateAccount models.UpdateAccount, userId string) (string, *models.
 		return "", nil, http.StatusUnauthorized, err
 	}
 
-	if user.Email != updateAccount.Email {
-		num, err := User.Find(bson.M{"email": updateAccount.Email}).Count()
-		if err != nil {
-			return "", nil, http.StatusInternalServerError, err
-		} else if num > 0 {
-			return "", nil, http.StatusInternalServerError, errors.New("Email already used by other user")
-		}
-
-		user.Email = updateAccount.Email
-	}
-
-	if updateAccount.Password != "" {
-		if updateAccount.Password != updateAccount.ConfirmPassword {
-			return "", nil, http.StatusInternalServerError, errors.New("Password confirmation don't match")
-		}
-
-		passwordHash, passwordSalt, err := HashAndSalt(updateAccount.Password)
-		if err != nil {
-			return "", nil, http.StatusInternalServerError, err
-		}
-
-		user.PasswordHash = passwordHash
-		user.PasswordSalt = passwordSalt
-	}
-
-	user.FirstName = updateAccount.FirstName
-	user.LastName = updateAccount.LastName
-	user.Address = updateAccount.Address
-
-	err = user.Save()
+	code, err := UpdateModelToUser(user, model.FirstName, model.LastName, model.Email, model.Password, model.ConfirmPassword, model.Address)
 	if err != nil {
-		return "", nil, http.StatusInternalServerError, err
+		return "", nil, code, err
 	}
 
 	token, sessionUser, code, err := RefreshUserSession(user)

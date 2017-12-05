@@ -16,6 +16,23 @@ body {
   text-align: center;
 }
 
+.margin-top-56 {
+  margin-top: 56px;
+}
+
+.action-card-header .md-card-title--contextual {
+  background: $md-yellow-200;
+}
+
+.action-card-header .md-card-title--contextual .md-card-title--title-contextual,
+.action-card-header .md-card-title--contextual .md-btn--icon {
+  color: $md-orange-a-700;
+}
+
+.pull-button-right > .md-menu-container {
+  float: right;
+}
+
 @media screen and (min-width: 320px) and (min-aspect-ratio: 13 / 9) {
   .md-toolbar-relative {
     margin-top: 56px; }
