@@ -3,3 +3,7 @@
 .vscode/
 frontend/yarn.lock
 debug
+logs/
+vendor/
+!vendor/vendor.json
+pkg/
