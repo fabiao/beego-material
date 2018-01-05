@@ -88,7 +88,7 @@ const mapFetchState = (code) => {
 }
 
 const performRequest = async (method, url, params, requestInstance) => {
-    const body = method === 'get' ? 'params' : 'data'
+    const body = method === 'GET' ? 'params' : 'data'
     const config = {
         method,
         url,

@@ -3,34 +3,31 @@ import {connect} from 'react-redux'
 import {
     Card,
     DataTable,
+    DialogContainer,
     TableHeader,
     TableBody,
     TableRow,
     TableColumn,
-    TablePagination,
-    EditDialogColumn,
-    Button } from 'react-md'
+    TablePagination } from 'react-md'
 import TableActions from '../components/TableActions'
 import ActionsMenu from '../components/ActionsMenu'
 import {Auth} from '../components/Authentication'
-import EditRecordDialog from '../components/EditRecordDialog'
 import EditOrgForm from '../components/EditOrgForm'
-import {loadOrgsAction, updateOrgAction} from '../actions/org'
+import {loadOrgsAction, editOrgAction, updateOrgAction} from '../actions/org'
 
 class Organizations extends Auth {
     state = {
         selectedRows: [],
-        count: 0,
-        dialogVisible: false,
-        currentOrg: null
+        count: 0
     }
 
     componentDidMount() {
         this.props.loadOrgsAction(this.props.pagination.currentPage, this.props.pagination.limit)
     }
 
-    handlePagination = (start, rowsPerPage) => {
-        this.props.loadOrgsAction(start, start + rowsPerPage)
+    handlePagination = (start, rowsPerPage, currentPage) => {
+        alert('start:' + start + ', rowsPerPage:' + rowsPerPage + ', currentPage:' + currentPage)
+        this.props.loadOrgsAction(start, rowsPerPage)
     }
 
     handleRowToggle = (row, selected, count) => {
@@ -45,42 +42,52 @@ class Organizations extends Auth {
     }
 
     reset = () => {
+        //alert('currentPage:' + this.props.pagination.currentPage + ', limit:' + this.props.pagination.limit)
         this.props.loadOrgsAction(this.props.pagination.currentPage, this.props.pagination.limit)
-    }
-
-    showEditRecordDialog = () => {
-        this.setState({ dialogVisible: true })
-    }
-
-    hideEditRecordDialog = () => {
-        this.setState({ dialogVisible: false })
     }
 
     handleSubmit = () => {
         alert('Eccoci')
     }
 
-    onInspectRecord = record => {
-        alert('onInspectRecord: ' + JSON.stringify(record))
+    onInspectRecord = (record) => {
+        alert('onInspectRecord: ' + JSON.stringify(record, null, 4))
     }
 
-    onEditRecord = record => {
-        alert('onEditRecord: ' + JSON.stringify(record))
+    onCreateRecord = () => {
+        const record = { name: null, address: { street: null, zipCode: null, city: null }}
+        alert('onEditRecord: ' + JSON.stringify(record, null, 4))
+        this.props.editOrgAction(record)
     }
 
-    onDeleteRecord = record => {
-        alert('onDeleteRecord: ' + JSON.stringify(record))
+    onEditRecord = (record) => {
+        alert('onEditRecord: ' + JSON.stringify(record, null, 4))
+        this.props.editOrgAction(record)
+    }
+
+    onDeleteRecord = (record) => {
+        alert('onDeleteRecord: ' + JSON.stringify(record, null, 4))
+    }
+
+    onHideEditRecordDialog = () => {
+        this.props.editOrgAction(null)
+    }
+
+    onFormChange = (values, dispatch, props) => {
+        //alert(JSON.stringify(values, null, 4))
+        //alert(JSON.stringify(dispatch, null, 4))
+        //alert(JSON.stringify(props, null, 4))
     }
 
     render() {
-        const { orgs, pagination } = this.props
-        const { count, dialogVisible, currentOrg } = this.state
+        const { currentOrg, orgs, pagination, updateOrgAction } = this.props
+        const { count } = this.state
         return (
             <Card className="md-block-centered">
                 <TableActions
                     title="Organizations"
                     count={count}
-                    onAddClick={this.showEditRecordDialog}
+                    onAddClick={this.onCreateRecord}
                     onRemoveClick={this.removeSelected}
                     onResetClick={this.reset}
                 />
@@ -101,7 +108,7 @@ class Organizations extends Auth {
                                 <TableColumn>{org.address.street}</TableColumn>
                                 <TableColumn>{org.address.zipCode}</TableColumn>
                                 <TableColumn>{org.address.city}</TableColumn>
-                                <ActionsMenu record={org}  onInspectRecord={this.onInspectRecord} onEditRecord={this.onEditRecord} onDeleteRecord={this.onDeleteRecord} />
+                                <ActionsMenu record={org} onInspectRecord={this.onInspectRecord} onEditRecord={this.onEditRecord} onDeleteRecord={this.onDeleteRecord} />
                             </TableRow>
                         ))}
                     </TableBody>
@@ -113,12 +120,15 @@ class Organizations extends Auth {
                         onPagination={this.handlePagination}
                     />
                 </DataTable>
-                <EditRecordDialog
-                    onHide={this.hideEditRecordDialog}
-                    visible={dialogVisible}
+                <DialogContainer
+                    id="edit-org-dialog"
+                    aria-labelledby="edit-org-dialog-title"
+                    visible={currentOrg != null}
+                    onHide={this.onHideEditRecordDialog}
+                    fullPage
                 >
-                    <EditOrgForm initialValues={currentOrg} onSubmit={values => this.submit(values)} />
-                </EditRecordDialog>
+                    <EditOrgForm initialValues={currentOrg} onChange={this.onFormChange} onSubmit={values => updateOrgAction(values)} onHide={this.onHideEditRecordDialog} />
+                </DialogContainer>
             </Card>
         )
     }
@@ -126,7 +136,7 @@ class Organizations extends Auth {
 
 const mapStateToProps = (state) => {
     //alert(JSON.stringify(state.org))
-    return { orgs: state.org.orgs, pagination: state.org.pagination }
+    return { currentOrg: state.org.currentOrg, orgs: state.org.orgs, pagination: state.org.pagination }
 }
 
-export default connect(mapStateToProps, {loadOrgsAction})(Organizations)
+export default connect(mapStateToProps, {loadOrgsAction, editOrgAction, updateOrgAction})(Organizations)

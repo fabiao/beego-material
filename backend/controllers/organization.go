@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 
-	"github.com/fabiao/beego-material/models"
-	"github.com/fabiao/beego-material/utils"
+	"github.com/fabiao/beego-material/backend/models"
+	"github.com/fabiao/beego-material/backend/utils"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -21,28 +22,31 @@ func (self *OrganizationController) Create() {
 	db := utils.GetDbManager()
 
 	Org := db.Organization()
-	org := &models.Organization{}
-
-	err, requestMap := Org.New(org, self.Ctx.Input.RequestBody)
+	var model models.OrganizationNew
+	err := json.Unmarshal(self.Ctx.Input.RequestBody, &model)
 	if err != nil {
 		self.ServeError(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if valid, errors := org.Validate(requestMap); valid {
+	org := &models.Organization{}
+	err, _ = Org.New(org)
+	if err != nil {
+		self.ServeError(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	org.Name = model.Name
+	org.Address = model.Address
+
+	if valid, errors := org.DefaultValidate(); valid {
 		err = org.Save()
 		if err != nil {
-			self.ServeError(http.StatusInternalServerError, err.Error())
+			self.ServeError(http.StatusBadRequest, err.Error())
 			return
 		}
 	} else {
 		self.ServeErrors(http.StatusBadRequest, utils.ToErrorStrings(errors))
-		return
-	}
-
-	err = org.Save()
-	if err != nil {
-		self.ServeError(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -53,28 +57,31 @@ func (self *OrganizationController) Update() {
 	db := utils.GetDbManager()
 
 	Org := db.Organization()
-	org := &models.Organization{}
-
-	err, requestMap := Org.New(org, self.Ctx.Input.RequestBody)
+	var model models.OrganizationEdit
+	err := json.Unmarshal(self.Ctx.Input.RequestBody, &model)
 	if err != nil {
 		self.ServeError(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if valid, errors := org.Validate(requestMap); valid {
+	org := &models.Organization{}
+	err = Org.FindId(model.Id).Exec(org)
+	if err != nil {
+		self.ServeError(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	org.Name = model.Name
+	org.Address = model.Address
+
+	if valid, errors := org.DefaultValidate(); valid {
 		err = org.Save()
 		if err != nil {
-			self.ServeError(http.StatusInternalServerError, err.Error())
+			self.ServeError(http.StatusBadRequest, err.Error())
 			return
 		}
 	} else {
 		self.ServeErrors(http.StatusBadRequest, utils.ToErrorStrings(errors))
-		return
-	}
-
-	err = org.Save()
-	if err != nil {
-		self.ServeError(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -122,8 +129,8 @@ func (self *OrganizationController) GetAny() {
 		return
 	}
 
-	self.response.CreatePaging(self.paging.skip, self.paging.limit, queryCount, len(orgs))
-	self.ServeContent("orgs", orgs)
+	paging, _ := self.CreatePaging(self.paging.skip, self.paging.limit, queryCount, len(orgs))
+	self.ServeContents(map[string]interface{}{"pagination": paging, "orgs": orgs})
 }
 
 func (self *OrganizationController) Get() {

@@ -4,13 +4,13 @@ const initialState = {
     currentUser: null
 }
 
-export default function(state = initialState, action) {
+export default function (state = initialState, action) {
     switch (action.type) {
         case USER_LOADED: {
-            return {...state, currentUser: action.currentUser}
+            return { ...state, currentUser: action.currentUser }
         }
         case USER_UPDATED: {
-            return {...state, currentUser: action.currentUser}
+            return { ...state, currentUser: action.currentUser }
         }
 
         default:

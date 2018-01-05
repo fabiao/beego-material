@@ -8,9 +8,10 @@ export const ORGS_LOADED = 'orgs_loaded'
 export const ORG_LOADED = 'org_loaded'
 export const ORG_UPDATED = 'org_updated'
 
-export const loadOrgsAction = (skip, take) => {
+export const loadOrgsAction = (skip, limit) => {
     return async (dispatch) => {
-        getAuth('/orgs?skip=' + skip + '&take=' + take/*, {skip: skip, take: take}*/)
+        //alert('/orgs?skip=' + skip + '&limit=' + limit)
+        getAuth('/orgs?skip=' + skip + '&limit=' + limit)
             .then(state => {
                 switch(state.name) {
                     case FetchCode.SUCCESS: {
@@ -70,64 +71,40 @@ export const loadOrgAction = (orgId) => {
     }
 }
 
-export const createOrgAction = (org) => {
+export const editOrgAction = (org) => {
     return async (dispatch) => {
-        postAuth('/orgs/', org)
-            .then(state => {
-                switch(state.name) {
-                    case FetchCode.SUCCESS: {
-                        dispatch({ type: ORG_UPDATED, org: state.data.org})
-                        return
-                    }
-                    case FetchCode.AUTH_FAILED: {
-                        dispatch(notifSend({
-                            message: state.message,
-                            kind: 'warning',
-                            dismissAfter: 20000
-                        }))
-                        dispatch(signOutAction())
-                        break
-                    }
-                    default: {
-                        dispatch(notifSend({
-                            message: state.message,
-                            kind: 'danger',
-                            dismissAfter: 20000
-                        }))
-                        break
-                    }
-                }
-            })
+        dispatch({ type: ORG_LOADED, org: org})
     }
 }
 
 export const updateOrgAction = (org) => {
     return async (dispatch) => {
-        putAuth('/orgs/', org)
-            .then(state => {
-                switch(state.name) {
-                    case FetchCode.SUCCESS: {
-                        dispatch({ type: ORG_UPDATED, org: state.data.org})
-                        return
-                    }
-                    case FetchCode.AUTH_FAILED: {
-                        dispatch(notifSend({
-                            message: state.message,
-                            kind: 'warning',
-                            dismissAfter: 20000
-                        }))
-                        dispatch(signOutAction())
-                        break
-                    }
-                    default: {
-                        dispatch(notifSend({
-                            message: state.message,
-                            kind: 'danger',
-                            dismissAfter: 20000
-                        }))
-                        break
-                    }
+        const method = (org.id != null) ? putAuth : postAuth
+        method('/orgs/', org)
+        .then(state => {
+            switch(state.name) {
+                case FetchCode.SUCCESS: {
+                    dispatch({ type: ORG_UPDATED, org: state.data.org})
+                    return
                 }
-            })
+                case FetchCode.AUTH_FAILED: {
+                    dispatch(notifSend({
+                        message: state.message,
+                        kind: 'warning',
+                        dismissAfter: 20000
+                    }))
+                    dispatch(signOutAction())
+                    break
+                }
+                default: {
+                    dispatch(notifSend({
+                        message: state.message,
+                        kind: 'danger',
+                        dismissAfter: 20000
+                    }))
+                    break
+                }
+            }
+        })
     }
 }

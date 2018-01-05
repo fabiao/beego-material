@@ -2,19 +2,20 @@ package utils
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/fabiao/beego-material/models"
-	"github.com/zebresel-com/mongodm"
-	"gopkg.in/mgo.v2/bson"
 	"net/http"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/fabiao/beego-material/backend/models"
+	"github.com/zebresel-com/mongodm"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
 	SESSION_TOKEN_EXPIRATION_TIME_MINS = 60
 )
 
-func RefreshUserSession(user *models.User) (string, *models.BaseUser, int, error) {
+func RefreshUserSession(user *models.User) (string, *models.UserBase, int, error) {
 	db := GetDbManager()
 	timeFunc := jwt.TimeFunc()
 	now := timeFunc.Unix()
@@ -43,10 +44,10 @@ func RefreshUserSession(user *models.User) (string, *models.BaseUser, int, error
 		return "", nil, http.StatusInternalServerError, err
 	}
 
-	return token, &user.BaseUser, http.StatusOK, nil
+	return token, &user.UserBase, http.StatusOK, nil
 }
 
-func Signin(login models.Signin) (string, *models.BaseUser, int, error) {
+func Signin(login models.Signin) (string, *models.UserBase, int, error) {
 	db := GetDbManager()
 	User := db.User()
 	user := &models.User{}
@@ -101,7 +102,7 @@ func UpdateModelToUser(user *models.User, firstName string, lastName string, ema
 	return http.StatusOK, nil
 }
 
-func Signup(model models.Signup) (string, *models.BaseUser, int, error) {
+func Signup(model models.Signup) (string, *models.UserBase, int, error) {
 	db := GetDbManager()
 	User := db.User()
 	user := &models.User{}
@@ -123,7 +124,7 @@ func Signup(model models.Signup) (string, *models.BaseUser, int, error) {
 	return token, sessionUser, http.StatusOK, nil
 }
 
-func UpdateAccount(model models.Signup, userId string) (string, *models.BaseUser, int, error) {
+func UpdateAccount(model models.Signup, userId string) (string, *models.UserBase, int, error) {
 	db := GetDbManager()
 	User := db.User()
 	user := &models.User{}

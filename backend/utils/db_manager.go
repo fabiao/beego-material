@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/astaxie/beego"
-	"github.com/fabiao/beego-material/models"
+	"github.com/fabiao/beego-material/backend/models"
 	"github.com/zebresel-com/mongodm"
 	"gopkg.in/mgo.v2"
 	"io/ioutil"

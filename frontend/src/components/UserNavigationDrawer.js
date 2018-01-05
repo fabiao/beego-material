@@ -4,11 +4,11 @@ import { NavigationDrawer } from 'react-md'
 import NavLink from '../components/NavLink'
 import AccountMenu from '../components/AccountMenu'
 import { Notifs } from 'redux-notifications'
-import {loadRouteBindingsAction} from '../actions/route'
+import {loadCurrentNavItemsAction} from '../actions/route'
 import 'redux-notifications/lib/styles.css'
 
 class UserNavigationDrawer extends React.PureComponent {
-    constructor(props) {
+    /*constructor(props) {
         super(props)
         this.state = {
             navItems: [{
@@ -17,42 +17,41 @@ class UserNavigationDrawer extends React.PureComponent {
                 icon: 'home'
             }]
         }
-    }
+    }*/
 
     componentDidMount() {
-        if (this.props.routeBindings.length === 0) {
-            this.props.loadRouteBindingsAction()
+        if (this.props.authenticated) {
+            this.props.loadCurrentNavItemsAction(this.props.router.route)
         }
     }
 
-    routeBindingsToNavItems = (routeBindings) => {
+    /*routeBindingsToNavItems = (routeBindings, route) => {
         if (routeBindings.length > 0) {
-            //alert('A')
             for (let i in routeBindings) {
                 const rb = routeBindings[i]
-                for (let j in rb.keys) {
-                    const key = rb.keys[j]
-                    const regexp = new RegExp(key)
-                    if (regexp.test(this.props.router.route)) {
-                        return rb.values
-                    }
+                if (rb.keys.includes(route)) {
+                    return rb.values
                 }
             }
         }
 
-        return []
-    }
+        return  [{
+            label: 'Home',
+            to: '/',
+            icon: 'home'
+        }]
+    }*/
 
     componentWillReceiveProps(nextProps) {
-        //alert(JSON.stringify(nextProps.routeBindings, null, 4))
-        if (this.props.router !== nextProps.router) {
-            const checkedRoutes = this.routeBindingsToNavItems(nextProps.routeBindings)
-            this.setState({ navItems: checkedRoutes })
+        if (this.props.router.route !== nextProps.router.route && nextProps.authenticated) {
+            this.props.loadCurrentNavItemsAction(nextProps.router.route)
+            //const checkedRoutes = this.routeBindingsToNavItems(nextProps.routeBindings, nextProps.router.route)
+            //this.setState({ navItems: checkedRoutes })
         }
     }
 
     render() {
-        const { navItems } = this.state
+        const { currentNavItems } = this.props
         return (
             <NavigationDrawer
                 defaultVisible={true}
@@ -60,7 +59,7 @@ class UserNavigationDrawer extends React.PureComponent {
                 mobileDrawerType={NavigationDrawer.DrawerTypes.TEMPORARY_MINI}
                 tabletDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
                 desktopDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT}
-                navItems={navItems.map(props => <NavLink {...props} key={props.to} />)}
+                navItems={currentNavItems.map(props => <NavLink {...props} key={props.to} />)}
                 toolbarActions={<AccountMenu />}
             >
                 {this.props.children}
@@ -72,7 +71,7 @@ class UserNavigationDrawer extends React.PureComponent {
 }
 
 const mapStateToProps = (state) => {
-    return { router: state.router, routeBindings: state.route.routeBindings, debugState: state.form }
+    return { authenticated: state.auth.authenticated, router: state.router, currentNavItems: state.route.navItems, debugState: state.org }
 }
 
-export default connect(mapStateToProps, {loadRouteBindingsAction})(UserNavigationDrawer)
+export default connect(mapStateToProps, {loadCurrentNavItemsAction})(UserNavigationDrawer)

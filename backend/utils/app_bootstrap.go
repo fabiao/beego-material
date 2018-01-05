@@ -3,7 +3,7 @@ package utils
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
-	"github.com/fabiao/beego-material/models"
+	"github.com/fabiao/beego-material/backend/models"
 	"gopkg.in/mgo.v2"
 	"time"
 )

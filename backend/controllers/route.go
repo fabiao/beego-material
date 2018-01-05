@@ -1,12 +1,15 @@
 package controllers
 
 import (
+	"net/http"
+	"net/url"
+	"strings"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
-	"github.com/fabiao/beego-material/utils"
+	"github.com/fabiao/beego-material/backend/models"
+	"github.com/fabiao/beego-material/backend/utils"
 	response "github.com/zebresel-com/beego-response"
-	"net/http"
-	"strings"
 )
 
 func init() {
@@ -34,6 +37,7 @@ func init() {
 		beego.NSRouter("/:userId", &UserController{}, "get:Get"),
 		beego.NSRouter("/current", &UserController{}, "get:GetCurrent;put:UpdateCurrent"),
 		beego.NSRouter("/allowedPaths", &RouteController{}, "get:GetAllowedPaths"),
+		beego.NSRouter("/nav-items", &RouteController{}, "get:GetNavItems"),
 	)
 	beego.AddNamespace(ns)
 
@@ -74,4 +78,44 @@ func (self *RouteController) GetAllowedPaths() {
 	}
 
 	self.ServeContent("allowedPaths", allowedPaths)
+}
+
+func (self *RouteController) GetNavItems() {
+	route := self.GetString("route")
+	route, err := url.PathUnescape(route)
+	if err != nil {
+		route = "/"
+	}
+
+	rm := utils.GetRoleManager()
+	roles := rm.GetUserRoles(self.currentUserId)
+	allowedPaths := []string{}
+	for _, r := range roles {
+		roleAllowedPaths := rm.GetRoleAllowedPaths(r)
+		allowedPaths = append(allowedPaths, roleAllowedPaths...)
+	}
+
+	rc := utils.GetRouteChecker()
+	routeBindings := rc.GetRouteBindings()
+	navItems := &[]models.Route{{
+		"/",
+		"Home",
+		"home",
+		false,
+	}}
+	for _, rb := range routeBindings {
+		found := false
+		for _, k := range rb.Keys {
+			if k == route {
+				navItems = &rb.Values
+				found = true
+				break
+			}
+		}
+		if found {
+			break
+		}
+	}
+
+	self.ServeContent("navItems", navItems)
 }

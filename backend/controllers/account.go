@@ -3,8 +3,8 @@ package controllers
 import (
 	"encoding/json"
 
-	"github.com/fabiao/beego-material/models"
-	"github.com/fabiao/beego-material/utils"
+	"github.com/fabiao/beego-material/backend/models"
+	"github.com/fabiao/beego-material/backend/utils"
 )
 
 // AccountController : here you tell us what AccountController is
@@ -29,17 +29,18 @@ func (ac *AccountController) Signin() {
 	})
 }
 
-func (self *AccountController) Signup() {
+// Signup : here you tell us what Signup is
+func (ac *AccountController) Signup() {
 	var signup models.Signup
-	json.Unmarshal(self.Ctx.Input.RequestBody, &signup)
+	json.Unmarshal(ac.Ctx.Input.RequestBody, &signup)
 
 	token, user, code, err := utils.Signup(signup)
 	if err != nil {
-		self.ServeError(code, err.Error())
+		ac.ServeError(code, err.Error())
 		return
 	}
 
-	self.ServeContents(map[string]interface{}{
+	ac.ServeContents(map[string]interface{}{
 		"token": token,
 		"user":  user,
 	})

@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/validation"
-	"github.com/fabiao/beego-material/models"
-	"github.com/fabiao/beego-material/utils"
-	"gopkg.in/mgo.v2/bson"
 	"net/http"
 	"strings"
+
+	"github.com/astaxie/beego/validation"
+	"github.com/fabiao/beego-material/backend/models"
+	"github.com/fabiao/beego-material/backend/utils"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type UserController struct {
@@ -34,10 +35,12 @@ func (self *UserController) Get() {
 
 	updatedUser := models.UpdatedUser{
 		user.Id,
-		user.FirstName,
-		user.LastName,
-		user.Email,
-		user.Address,
+		models.UserBase{
+			user.FirstName,
+			user.LastName,
+			user.Email,
+			user.Address,
+		},
 	}
 
 	self.ServeContent("user", updatedUser)
@@ -79,10 +82,12 @@ func (self *UserController) Create() {
 
 	updatedUser := models.UpdatedUser{
 		user.Id,
-		user.FirstName,
-		user.LastName,
-		user.Email,
-		user.Address,
+		models.UserBase{
+			user.FirstName,
+			user.LastName,
+			user.Email,
+			user.Address,
+		},
 	}
 
 	self.ServeContent("user", updatedUser)
@@ -124,10 +129,12 @@ func (self *UserController) Update() {
 
 	updatedUser := models.UpdatedUser{
 		user.Id,
-		user.FirstName,
-		user.LastName,
-		user.Email,
-		user.Address,
+		models.UserBase{
+			user.FirstName,
+			user.LastName,
+			user.Email,
+			user.Address,
+		},
 	}
 
 	self.ServeContent("user", updatedUser)
@@ -217,8 +224,8 @@ func (self *UserController) GetAny() {
 		return
 	}
 
-	self.response.CreatePaging(self.paging.skip, self.paging.limit, queryCount, len(users))
-	self.ServeContent("users", users)
+	paging, _ := self.CreatePaging(self.paging.skip, self.paging.limit, queryCount, len(users))
+	self.ServeContents(map[string]interface{}{"pagination": paging, "users": users})
 }
 
 func (self *UserController) GetCurrent() {
@@ -233,5 +240,5 @@ func (self *UserController) GetCurrent() {
 		return
 	}
 
-	self.ServeContent("user", user.BaseUser)
+	self.ServeContent("user", user.UserBase)
 }

@@ -3,7 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"github.com/astaxie/beego"
-	"github.com/fabiao/beego-material/models"
+	"github.com/fabiao/beego-material/backend/models"
 	"io/ioutil"
 )
 
