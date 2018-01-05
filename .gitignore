@@ -1,9 +1,3 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
 .vscode/
-frontend/yarn.lock
-debug
-logs/
-vendor/
-!vendor/vendor.json
-pkg/

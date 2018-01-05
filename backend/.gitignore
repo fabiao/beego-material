@@ -1,0 +1,4 @@
+debug
+logs/
+vendor/
+!vendor/vendor.json
