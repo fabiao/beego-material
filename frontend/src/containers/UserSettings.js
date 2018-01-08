@@ -2,17 +2,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Card, CardTitle } from 'react-md'
 import UserSettingsForm from '../components/UserSettingsForm'
-import { loadUserAction, updateUserAction } from '../actions/user'
+import { loadCurrentUserAction, updateCurrentUserAction } from '../actions/user'
 import { Auth } from '../components/Authentication'
 
 
 class UserSettings extends Auth {
     componentDidMount() {
-        this.props.loadUserAction()
+        this.props.loadCurrentUserAction()
     }
 
     submit = (values) => {
-        this.props.updateUserAction(values)
+        this.props.updateCurrentUserAction(values)
     }
 
     errorMessage() {
@@ -40,5 +40,5 @@ const mapStateToProps = (state) => {
     return { user: state.user.currentUser }
 }
 
-export default connect(mapStateToProps, {loadUserAction, updateUserAction})(UserSettings)
+export default connect(mapStateToProps, {loadCurrentUserAction, updateCurrentUserAction})(UserSettings)
 

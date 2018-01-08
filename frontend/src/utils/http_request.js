@@ -156,6 +156,10 @@ export const updateAuthRequestToken = (token) => {
     authRequestInstance.defaults.headers.common['Authorization'] = 'Bearer ' + token
 }
 
+export const removeAuthRequestToken = () => {
+    delete authRequestInstance.defaults.headers.common['Authorization']
+}
+
 export const getAuth = (url, params) => {
     //alert(authRequestInstance.defaults.headers.common['Authorization'])
     return performRequest('GET', url, params, authRequestInstance)

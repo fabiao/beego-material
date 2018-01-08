@@ -8,6 +8,7 @@ import Signup from './containers/Signup'
 import Signout from './containers/Signout'
 import UserSettings from './containers/UserSettings'
 import Organizations from './containers/Organizations'
+import Users from './containers/Users'
 
 let NoMatch = ({ router }) => (
     <div>
@@ -54,6 +55,7 @@ export default class App extends React.PureComponent {
                     <Fragment forRoute='/signout'><Signout/></Fragment>
                     <Fragment forRoute='/user-settings'><UserSettings/></Fragment>
                     <Fragment forRoute='/orgs'><Organizations/></Fragment>
+                    <Fragment forRoute='/users'><Users/></Fragment>
                     <Fragment forNoMatch><NoMatch/></Fragment>
                 </UserNavigationDrawer>
             </Fragment>

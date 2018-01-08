@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Link } from 'redux-little-router'
 import { Card, CardTitle } from 'react-md'
 import SigninForm from '../components/SigninForm'
-import { signInAction } from '../actions/auth'
+import { signInAction } from '../actions/user'
 import { NoAuth } from '../components/Authentication'
 
 class Signin extends NoAuth {

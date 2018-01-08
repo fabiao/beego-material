@@ -95,11 +95,11 @@ func (self *OrganizationController) GetAny() {
 	orgs := []*models.Organization{}
 
 	filter := bson.M{"deleted": false}
-	if self.paging.searchValue != "" {
-		if self.paging.searchField != "" {
-			filter = bson.M{"deleted": false, self.paging.searchField: self.paging.searchValue}
+	if self.paging.SearchValue != "" {
+		if self.paging.SearchField != "" {
+			filter = bson.M{"deleted": false, self.paging.SearchField: self.paging.SearchValue}
 		} else {
-			splitted := strings.Split(self.paging.searchValue, " ")
+			splitted := strings.Split(self.paging.SearchValue, " ")
 			regexArray := []interface{}{}
 
 			for _, value := range splitted {
@@ -123,14 +123,35 @@ func (self *OrganizationController) GetAny() {
 		return
 	}
 
-	err := query.Sort("name").Skip(self.paging.skip).Limit(self.paging.limit).Exec(&orgs)
+	err := query.Sort("name").Skip(self.paging.Skip).Limit(self.paging.Limit).Exec(&orgs)
 	if len(orgs) > 0 && err != nil {
 		self.ServeError(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	paging, _ := self.CreatePaging(self.paging.skip, self.paging.limit, queryCount, len(orgs))
-	self.ServeContents(map[string]interface{}{"pagination": paging, "orgs": orgs})
+	/*allOrgs := []*models.Organization{}
+	for i := 1; i <= 101; i++ {
+		org := &models.Organization{}
+		indexString := strconv.Itoa(i)
+		org.Id = bson.ObjectId(indexString)
+		org.Name = "Org n." + indexString
+		org.Address = &models.Address{
+			Street:  "Via le mani dal naso n. 1" + indexString,
+			ZipCode: "11100",
+			City:    "Aosta",
+		}
+		allOrgs = append(allOrgs, org)
+	}
+	numRecords := len(allOrgs)
+	lastIndex := self.paging.Skip + self.paging.Limit
+	if lastIndex > numRecords {
+		lastIndex = numRecords
+	}
+	orgs = allOrgs[self.paging.Skip:lastIndex]*/
+
+	self.paging.Rows = queryCount
+
+	self.ServeContents(map[string]interface{}{"pagination": self.paging, "orgs": orgs})
 }
 
 func (self *OrganizationController) Get() {

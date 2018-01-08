@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { push } from 'redux-little-router'
 import PropTypes from 'prop-types'
 
-class Authentication extends React.PureComponent {
+class Authentication extends React.Component {
     componentWillMount() {
         if (!this.props.authenticated) {
             this.props.dispatch(push('/signin'))
@@ -22,12 +22,12 @@ class Authentication extends React.PureComponent {
 }
 
 const mapStateToProps = (state) => {
-    return { authenticated: state.auth.authenticated }
+    return { authenticated: state.user.currentUser != null }
 }
 
 export const Auth = connect(mapStateToProps)(Authentication)
 
-class NoRequireAuthentication extends React.PureComponent {
+class NoRequireAuthentication extends React.Component {
     componentWillMount() {
         if (this.props.authenticated) {
             this.props.dispatch(push('/'))

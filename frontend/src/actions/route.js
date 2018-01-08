@@ -1,6 +1,6 @@
 import { FetchCode, get, getAuth } from '../utils/http_request'
 import { actions as notifActions } from 'redux-notifications'
-import { signOutAction } from './auth'
+import { signOutAction } from './user'
 
 const { notifSend } = notifActions
 

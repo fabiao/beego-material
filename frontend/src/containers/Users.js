@@ -12,22 +12,22 @@ import {
 import TableActions from '../components/TableActions'
 import ActionsMenu from '../components/ActionsMenu'
 import {Auth} from '../components/Authentication'
-import EditOrgForm from '../components/EditOrgForm'
-import {loadOrgsAction, editOrgAction, updateOrgAction} from '../actions/org'
+import EditUserForm from '../components/EditUserForm'
+import {loadUsersAction, editUserAction, updateUserAction} from '../actions/user'
 
-class Organizations extends Auth {
+class Users extends Auth {
     state = {
         selectedRows: [],
-        count: 0
+        count: 0,
     }
 
     componentDidMount() {
-        this.props.loadOrgsAction(this.props.pagination.skip, this.props.pagination.limit)
+        this.props.loadUsersAction(this.props.pagination.skip, this.props.pagination.limit)
     }
 
     handlePagination = (start, rowsPerPage, currentPage) => {
         //alert('start:' + start + ', rowsPerPage:' + rowsPerPage + ', currentPage:' + currentPage)
-        this.props.loadOrgsAction(start, rowsPerPage)
+        this.props.loadUsersAction(start, rowsPerPage)
     }
 
     handleRowToggle = (row, selected, count) => {
@@ -43,7 +43,7 @@ class Organizations extends Auth {
 
     reset = () => {
         //alert('currentPage:' + this.props.pagination.currentPage + ', limit:' + this.props.pagination.limit)
-        this.props.loadOrgsAction(this.props.pagination.skip, this.props.pagination.limit)
+        this.props.loadUsersAction(this.props.pagination.skip, this.props.pagination.limit)
     }
 
     onInspectRecord = (record) => {
@@ -51,14 +51,14 @@ class Organizations extends Auth {
     }
 
     onCreateRecord = () => {
-        const record = { name: null, address: { street: null, zipCode: null, city: null }}
-        alert('onCreateRecord: ' + JSON.stringify(record, null, 4))
-        this.props.editOrgAction(record)
+        const record = { firstName: null, lastName: null, email: null, address: { street: null, zipCode: null, city: null }}
+        alert('onEditRecord: ' + JSON.stringify(record, null, 4))
+        this.props.editUserAction(record)
     }
 
     onEditRecord = (record) => {
         alert('onEditRecord: ' + JSON.stringify(record, null, 4))
-        this.props.editOrgAction(record)
+        this.props.editUserAction(record)
     }
 
     onDeleteRecord = (record) => {
@@ -66,7 +66,7 @@ class Organizations extends Auth {
     }
 
     onHideEditRecordDialog = () => {
-        this.props.editOrgAction(null)
+        this.props.editUserAction(null)
     }
 
     onFormChange = (values, dispatch, props) => {
@@ -76,12 +76,12 @@ class Organizations extends Auth {
     }
 
     render() {
-        const { selectedOrg, orgs, pagination, updateOrgAction } = this.props
+        const { selectedUser, users, pagination, updateUserAction } = this.props
         const { count } = this.state
         return (
             <Card className="md-block-centered">
                 <TableActions
-                    title="Organizations"
+                    title="Users"
                     count={count}
                     onAddClick={this.onCreateRecord}
                     onRemoveClick={this.removeSelected}
@@ -90,21 +90,25 @@ class Organizations extends Auth {
                 <DataTable baseId={1} onRowToggle={this.handleRowToggle}>
                     <TableHeader>
                         <TableRow>
-                            <TableColumn key={1}>Name</TableColumn>
-                            <TableColumn key={2}>Street</TableColumn>
-                            <TableColumn key={3}>Zip code</TableColumn>
-                            <TableColumn key={4}>City</TableColumn>
+                            <TableColumn key={1}>First name</TableColumn>
+                            <TableColumn key={2}>Last name</TableColumn>
+                            <TableColumn key={3}>Email</TableColumn>
+                            <TableColumn key={4}>Street</TableColumn>
+                            <TableColumn key={5}>Zip code</TableColumn>
+                            <TableColumn key={6}>City</TableColumn>
                             <TableColumn/>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orgs.map((org, index) => (
+                        {users.map((user, index) => (
                             <TableRow key={index}>
-                                <TableColumn>{org.name}</TableColumn>
-                                <TableColumn>{org.address.street}</TableColumn>
-                                <TableColumn>{org.address.zipCode}</TableColumn>
-                                <TableColumn>{org.address.city}</TableColumn>
-                                <ActionsMenu record={org} onInspectRecord={this.onInspectRecord} onEditRecord={this.onEditRecord} onDeleteRecord={this.onDeleteRecord} />
+                                <TableColumn>{user.firstName}</TableColumn>
+                                <TableColumn>{user.lastName}</TableColumn>
+                                <TableColumn>{user.email}</TableColumn>
+                                <TableColumn>{user.address.street}</TableColumn>
+                                <TableColumn>{user.address.zipCode}</TableColumn>
+                                <TableColumn>{user.address.city}</TableColumn>
+                                <ActionsMenu record={user} onInspectRecord={this.onInspectRecord} onEditRecord={this.onEditRecord} onDeleteRecord={this.onDeleteRecord} />
                             </TableRow>
                         ))}
                     </TableBody>
@@ -115,13 +119,13 @@ class Organizations extends Auth {
                     />
                 </DataTable>
                 <DialogContainer
-                    id="edit-org-dialog"
-                    aria-labelledby="edit-org-dialog-title"
-                    visible={selectedOrg != null}
+                    id="edit-user-dialog"
+                    aria-labelledby="edit-user-dialog-title"
+                    visible={selectedUser != null}
                     onHide={this.onHideEditRecordDialog}
                     fullPage
                 >
-                    <EditOrgForm initialValues={selectedOrg} onSubmit={values => updateOrgAction(values)} onHide={this.onHideEditRecordDialog} />
+                    <EditUserForm initialValues={selectedUser} onSubmit={values => updateUserAction(values)} onHide={this.onHideEditRecordDialog} />
                 </DialogContainer>
             </Card>
         )
@@ -129,8 +133,8 @@ class Organizations extends Auth {
 }
 
 const mapStateToProps = (state) => {
-    //alert(JSON.stringify(state.org))
-    return { selectedOrg: state.org.selectedOrg, orgs: state.org.orgs, pagination: state.org.pagination }
+    //alert(JSON.stringify(state.user))
+    return { selectedUser: state.user.selectedUser, users: state.user.users, pagination: state.user.pagination }
 }
 
-export default connect(mapStateToProps, {loadOrgsAction, editOrgAction, updateOrgAction})(Organizations)
+export default connect(mapStateToProps, {loadUsersAction, editUserAction, updateUserAction})(Users)

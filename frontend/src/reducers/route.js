@@ -9,14 +9,14 @@ const initialState = {
     }]
 }
 
-export default function(state = initialState, action) {
+export default function (state = initialState, action) {
     switch (action.type) {
         case ROUTE_BINDINGS_LOADED: {
-            return {...state, routeBindings: action.routeBindings}
+            return { ...state, routeBindings: action.routeBindings }
         }
 
         case CURRENT_NAV_ITEMS_LOADED: {
-            return {...state, navItems: action.navItems}
+            return { ...state, navItems: action.navItems }
         }
 
         default:

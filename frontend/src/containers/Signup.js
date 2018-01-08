@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Card, CardTitle } from 'react-md'
 import SignupForm from '../components/SignupForm'
-import { signUpAction } from '../actions/auth'
+import { signUpAction } from '../actions/user'
 import { NoAuth } from '../components/Authentication'
 
 class Signup extends NoAuth {

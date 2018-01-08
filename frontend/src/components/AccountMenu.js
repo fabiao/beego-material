@@ -9,24 +9,11 @@ import {
 } from 'react-md'
 import { Link } from 'redux-little-router'
 import NavLink from './NavLink'
-import { loadUserAction } from '../actions/user'
+import { loadCurrentUserAction } from '../actions/user'
 
 import './AccountMenu.css'
 
 class AccountMenu extends React.PureComponent {
-    componentDidMount() {
-        if (this.props.authenticated && this.props.user == null) {
-            this.props.loadUserAction()
-        }
-    }
-
-    componentWillUpdate(nextProps) {
-        //alert(JSON.stringify(nextProps))
-        if (nextProps.authenticated && nextProps.user == null) {
-            this.props.loadUserAction()
-        }
-    }
-
     renderUnauthMenu = () => {
         return (
             <Link className="md-fake-btn md-pointer--hover md-fake-btn--no-outline md-list-tile md-list-tile--icon md-text md-text--inherit v-margin-12" href="/signin">
@@ -88,13 +75,13 @@ class AccountMenu extends React.PureComponent {
     }
 
     render() {
-        const { authenticated, user } = this.props
-        return authenticated && user != null ? this.renderAuthMenu(user) : this.renderUnauthMenu()
+        const { currentUser } = this.props
+        return currentUser != null ? this.renderAuthMenu(currentUser) : this.renderUnauthMenu()
     }
 }
 
 function mapStateToProps(state) {
-    return  { authenticated: state.auth.authenticated, user: state.user.currentUser }
+    return  { currentUser: state.user.currentUser }
 }
 
-export default connect(mapStateToProps, {loadUserAction})(AccountMenu)
+export default connect(mapStateToProps, {loadCurrentUserAction})(AccountMenu)

@@ -72,7 +72,11 @@ func UpdateModelToUser(user *models.User, firstName string, lastName string, ema
 	db := GetDbManager()
 	User := db.User()
 
-	num, err := User.Find(bson.M{"email": email}).Count()
+	num, err := User.Find(
+		bson.M{
+			"email": email,
+			"_id":   bson.M{"$ne": user.Id},
+		}).Count()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	} else if num > 0 {
@@ -102,6 +106,33 @@ func UpdateModelToUser(user *models.User, firstName string, lastName string, ema
 	return http.StatusOK, nil
 }
 
+func UpdateModelToUserBase(user *models.User, firstName string, lastName string, email string, address *models.Address) (int, error) {
+	db := GetDbManager()
+	User := db.User()
+
+	num, err := User.Find(
+		bson.M{
+			"email": email,
+			"_id":   bson.M{"$ne": user.Id},
+		}).Count()
+	if err != nil {
+		return http.StatusInternalServerError, err
+	} else if num > 0 {
+		return http.StatusInternalServerError, errors.New("Email already used by other user")
+	}
+
+	user.FirstName = firstName
+	user.LastName = lastName
+	user.Email = email
+	user.Address = address
+	err = user.Save()
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
+
 func Signup(model models.Signup) (string, *models.UserBase, int, error) {
 	db := GetDbManager()
 	User := db.User()
@@ -112,6 +143,28 @@ func Signup(model models.Signup) (string, *models.UserBase, int, error) {
 	}
 
 	code, err := UpdateModelToUser(user, model.FirstName, model.LastName, model.Email, model.Password, model.ConfirmPassword, model.Address)
+	if err != nil {
+		return "", nil, code, err
+	}
+
+	token, sessionUser, code, err := RefreshUserSession(user)
+	if err != nil {
+		return "", nil, code, err
+	}
+
+	return token, sessionUser, http.StatusOK, nil
+}
+
+func UpdateAccountBase(model models.UserBase, userId string) (string, *models.UserBase, int, error) {
+	db := GetDbManager()
+	User := db.User()
+	user := &models.User{}
+	err := User.FindId(bson.ObjectIdHex(userId)).Exec(user)
+	if err != nil {
+		return "", nil, http.StatusUnauthorized, err
+	}
+
+	code, err := UpdateModelToUserBase(user, model.FirstName, model.LastName, model.Email, model.Address)
 	if err != nil {
 		return "", nil, code, err
 	}

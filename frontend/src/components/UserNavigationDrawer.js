@@ -71,7 +71,7 @@ class UserNavigationDrawer extends React.PureComponent {
 }
 
 const mapStateToProps = (state) => {
-    return { authenticated: state.auth.authenticated, router: state.router, currentNavItems: state.route.navItems, debugState: state.org }
+    return { authenticated: state.user.currentUser != null, router: state.router, currentNavItems: state.route.navItems, debugState: state.user }
 }
 
 export default connect(mapStateToProps, {loadCurrentNavItemsAction})(UserNavigationDrawer)

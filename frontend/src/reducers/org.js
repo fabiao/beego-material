@@ -1,17 +1,12 @@
 import { ORGS_LOADED, ORG_LOADED, ORG_UPDATED } from '../actions/org'
 
 const initialState = {
-    currentOrg: null,
+    selectedOrg: null,
     orgs: [],
     pagination: {
-        first: null,
-        last: null,
-        previous: "",
-        next: "",
-        totalRecords: 0,
+        skip: 0,
         limit: 10,
-        pages: 0,
-        currentPage: 0
+        rows: 0
     }
 }
 
@@ -21,7 +16,7 @@ export default function (state = initialState, action) {
             return { ...state, orgs: action.orgs, pagination: action.pagination }
         }
         case ORG_LOADED: {
-            return { ...state, currentOrg: action.org }
+            return { ...state, selectedOrg: action.org }
         }
         case ORG_UPDATED: {
             const orgs = state.orgs
@@ -32,7 +27,7 @@ export default function (state = initialState, action) {
                 org.name = action.org.name
                 org.address = action.org.address
             }
-            return { ...state, orgs: orgs, currentOrg: null }
+            return { ...state, orgs: orgs, selectedOrg: null }
         }
 
         default:

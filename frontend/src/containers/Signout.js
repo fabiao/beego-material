@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { signOutAction } from '../actions/auth'
+import { signOutAction } from '../actions/user'
 
 class Signout extends React.PureComponent {
     componentWillMount() {

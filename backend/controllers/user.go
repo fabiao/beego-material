@@ -36,10 +36,10 @@ func (self *UserController) Get() {
 	updatedUser := models.UpdatedUser{
 		user.Id,
 		models.UserBase{
-			user.FirstName,
-			user.LastName,
-			user.Email,
-			user.Address,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+			Address:   user.Address,
 		},
 	}
 
@@ -130,10 +130,10 @@ func (self *UserController) Update() {
 	updatedUser := models.UpdatedUser{
 		user.Id,
 		models.UserBase{
-			user.FirstName,
-			user.LastName,
-			user.Email,
-			user.Address,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+			Address:   user.Address,
 		},
 	}
 
@@ -141,7 +141,7 @@ func (self *UserController) Update() {
 }
 
 func (self *UserController) UpdateCurrent() {
-	var model models.Signup
+	var model models.UserBase
 	err := json.Unmarshal(self.Ctx.Input.RequestBody, &model)
 	if err != nil {
 		self.ServeError(http.StatusInternalServerError, err.Error())
@@ -159,7 +159,7 @@ func (self *UserController) UpdateCurrent() {
 		return
 	}
 
-	token, sessionUser, code, err := utils.UpdateAccount(model, self.currentUserId)
+	token, sessionUser, code, err := utils.UpdateAccountBase(model, self.currentUserId)
 	if err != nil {
 		self.ServeError(code, err.Error())
 		return
@@ -183,18 +183,13 @@ func (self *UserController) GetAny() {
 	query := bson.M{"deleted": false}
 
 	if searchTag != "" {
-
 		if fieldName != "" {
-
 			query = bson.M{"deleted": false, fieldName: searchTag}
-
 		} else {
-
 			splitted := strings.Split(searchTag, " ")
 			regexArray := []interface{}{}
 
 			for _, value := range splitted {
-
 				if len(value) > 0 {
 					regexArray = append(regexArray, &bson.RegEx{Pattern: value, Options: "i"})
 				}
@@ -206,7 +201,6 @@ func (self *UserController) GetAny() {
 					bson.M{"firstName": bson.M{"$in": regexArray}},
 					bson.M{"lastName": bson.M{"$in": regexArray}},
 					bson.M{"email": bson.M{"$in": regexArray}},
-					bson.M{"username": bson.M{"$in": regexArray}},
 				}}
 		}
 	}
@@ -217,15 +211,27 @@ func (self *UserController) GetAny() {
 		return
 	}
 
-	err := User.Find(query).Sort("-createdAt").Skip(self.paging.skip).Limit(self.paging.limit).Exec(&users)
-
+	err := User.Find(query).Sort("lastName").Skip(self.paging.Skip).Limit(self.paging.Limit).Exec(&users)
 	if len(users) > 0 && err != nil {
 		self.ServeError(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	paging, _ := self.CreatePaging(self.paging.skip, self.paging.limit, queryCount, len(users))
-	self.ServeContents(map[string]interface{}{"pagination": paging, "users": users})
+	self.paging.Rows = queryCount
+	pagedUsers := make([]*models.UpdatedUser, len(users))
+	for i, u := range users {
+		pagedUsers[i] = &models.UpdatedUser{
+			Id: u.Id,
+			UserBase: models.UserBase{
+				FirstName: u.FirstName,
+				LastName:  u.LastName,
+				Email:     u.Email,
+				Address:   u.Address,
+			},
+		}
+	}
+
+	self.ServeContents(map[string]interface{}{"pagination": self.paging, "users": pagedUsers})
 }
 
 func (self *UserController) GetCurrent() {
