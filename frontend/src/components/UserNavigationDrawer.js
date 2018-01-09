@@ -8,39 +8,11 @@ import {loadCurrentNavItemsAction} from '../actions/route'
 import 'redux-notifications/lib/styles.css'
 
 class UserNavigationDrawer extends React.PureComponent {
-    /*constructor(props) {
-        super(props)
-        this.state = {
-            navItems: [{
-                label: 'Home',
-                to: '/',
-                icon: 'home'
-            }]
-        }
-    }*/
-
     componentDidMount() {
         if (this.props.authenticated) {
             this.props.loadCurrentNavItemsAction(this.props.router.route)
         }
     }
-
-    /*routeBindingsToNavItems = (routeBindings, route) => {
-        if (routeBindings.length > 0) {
-            for (let i in routeBindings) {
-                const rb = routeBindings[i]
-                if (rb.keys.includes(route)) {
-                    return rb.values
-                }
-            }
-        }
-
-        return  [{
-            label: 'Home',
-            to: '/',
-            icon: 'home'
-        }]
-    }*/
 
     componentWillReceiveProps(nextProps) {
         if (this.props.router.route !== nextProps.router.route && nextProps.authenticated) {
@@ -71,7 +43,7 @@ class UserNavigationDrawer extends React.PureComponent {
 }
 
 const mapStateToProps = (state) => {
-    return { authenticated: state.user.currentUser != null, router: state.router, currentNavItems: state.route.navItems, debugState: state.user }
+    return { authenticated: state.user.currentUser != null, router: state.router, currentNavItems: state.route.navItems, debugState: state.router }
 }
 
 export default connect(mapStateToProps, {loadCurrentNavItemsAction})(UserNavigationDrawer)

@@ -2,8 +2,9 @@ package utils
 
 import (
 	"encoding/hex"
-	"golang.org/x/crypto/scrypt"
 	"math/rand"
+
+	"golang.org/x/crypto/scrypt"
 )
 
 const (
@@ -11,7 +12,7 @@ const (
 	ITERATIONS  = 32768
 	R           = 8
 	P           = 1
-	KEY_LEN     = 64
+	KEY_LEN     = 32
 )
 
 func GenerateRandomBytes(length int) ([]byte, error) {

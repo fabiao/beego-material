@@ -114,7 +114,9 @@ const performRequest = async (method, url, params, requestInstance) => {
             case 403:
             case 409:
             case 500: {
-                fetchState.message = response.data.error.message
+                fetchState.message = response.data.error.message !== undefined ?
+                response.data.error.message :
+                response.data.error
                 break
             }
             default:
@@ -152,7 +154,6 @@ const authRequestInstance = axios.create({
 })
 
 export const updateAuthRequestToken = (token) => {
-    //if (token == null) { alert('Null token in updateAuthRequestToken') }
     authRequestInstance.defaults.headers.common['Authorization'] = 'Bearer ' + token
 }
 

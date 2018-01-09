@@ -74,7 +74,6 @@ func (e EasyToken) GetToken() (string, error) {
 // ValidateToken get token strings and return if is valid or not
 func (e EasyToken) ValidateToken(tokenString string) (bool, string, error) {
 	// Token from another example.  This token is expired
-	//var tokenString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJleHAiOjE1MDAwLCJpc3MiOiJ0ZXN0In0.HE7fK0xOQwFEr4WDgRWj4teRPZ6i3GLwD5YCm6Pwu_c"
 	if tokenString == "" {
 		return false, "", errors.New("token is empty")
 	}

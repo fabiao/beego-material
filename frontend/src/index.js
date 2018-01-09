@@ -5,6 +5,7 @@ import { initializeCurrentLocation } from 'redux-little-router'
 import App from './App'
 import WebFontLoader from 'webfontloader'
 import { checkUserAuthenticated, getToken, getUser } from './utils/session_storage'
+import { resetSessionData } from './utils/session_manager'
 import { updateAuthRequestToken } from './utils/http_request'
 import configureStore from './store.js'
 import register from './registerServiceWorker'
@@ -31,6 +32,7 @@ if (checkUserAuthenticated()) {
         store.dispatch({ type: CURRENT_USER_LOADED, currentUser: getUser() })
     }
 } else {
+    resetSessionData()
     store.dispatch({ type: CURRENT_USER_LOADED, currentUser: null })
 }
 

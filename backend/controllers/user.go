@@ -94,7 +94,7 @@ func (self *UserController) Create() {
 }
 
 func (self *UserController) Update() {
-	var model models.UserToUpdate
+	var model models.UpdatedUser
 	err := json.Unmarshal(self.Ctx.Input.RequestBody, &model)
 	if err != nil {
 		self.ServeError(http.StatusInternalServerError, err.Error())
@@ -121,23 +121,27 @@ func (self *UserController) Update() {
 		return
 	}
 
-	code, err := utils.UpdateModelToUser(user, model.FirstName, model.LastName, model.Email, model.Password, model.ConfirmPassword, model.Address)
+	code, err := utils.UpdateModelToUserBase(user, model.FirstName, model.LastName, model.Email, model.Address)
 	if err != nil {
 		self.ServeError(code, err.Error())
 		return
 	}
 
-	updatedUser := models.UpdatedUser{
-		user.Id,
-		models.UserBase{
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			Email:     user.Email,
-			Address:   user.Address,
-		},
+	if user.Id.Hex() == self.currentUserId {
+		token, _, code, err := utils.UpdateAccountBase(user.UserBase, self.currentUserId)
+		if err != nil {
+			self.ServeError(code, err.Error())
+			return
+		}
+
+		self.ServeContents(map[string]interface{}{
+			"token": token,
+			"user":  user,
+		})
+		return
 	}
 
-	self.ServeContent("user", updatedUser)
+	self.ServeContent("user", user)
 }
 
 func (self *UserController) UpdateCurrent() {

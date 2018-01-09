@@ -9,7 +9,6 @@ import {
 } from 'react-md'
 import { Link } from 'redux-little-router'
 import NavLink from './NavLink'
-import { loadCurrentUserAction } from '../actions/user'
 
 import './AccountMenu.css'
 
@@ -76,7 +75,7 @@ class AccountMenu extends React.PureComponent {
 
     render() {
         const { currentUser } = this.props
-        return currentUser != null ? this.renderAuthMenu(currentUser) : this.renderUnauthMenu()
+        return currentUser ? this.renderAuthMenu(currentUser) : this.renderUnauthMenu()
     }
 }
 
@@ -84,4 +83,4 @@ function mapStateToProps(state) {
     return  { currentUser: state.user.currentUser }
 }
 
-export default connect(mapStateToProps, {loadCurrentUserAction})(AccountMenu)
+export default connect(mapStateToProps, null)(AccountMenu)

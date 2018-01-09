@@ -1,7 +1,8 @@
-import { FetchCode, getAuth, putAuth, post, removeAuthRequestToken } from '../utils/http_request'
+import { FetchCode, getAuth, putAuth, post } from '../utils/http_request'
 import { actions as notifActions } from 'redux-notifications'
-import { setUserAndToken } from '../utils/session_storage'
+import { applySessionData, resetSessionData } from '../utils/session_manager'
 import { push } from 'redux-little-router'
+import _ from 'lodash'
 
 const { notifSend } = notifActions
 
@@ -85,6 +86,11 @@ export const updateUserAction = (user) => {
             .then(state => {
                 switch(state.name) {
                     case FetchCode.SUCCESS: {
+                        if (state.data.token !== undefined) {
+                            const baseUser = _.omit(state.data.user, ['id'])
+                            applySessionData(baseUser, state.data.token)
+                            dispatch({ type: CURRENT_USER_UPDATED, currentUser: baseUser})
+                        }
                         dispatch({ type: USER_UPDATED, selectedUser: state.data.user})
                         dispatch(notifSend({
                             message: 'User update completed',
@@ -154,7 +160,7 @@ export const updateCurrentUserAction = ({ firstName, lastName, email, password, 
             .then(state => {
                 switch(state.name) {
                     case FetchCode.SUCCESS: {
-                        setUserAndToken(state.data.user, state.data.token)
+                        applySessionData(state.data.user, state.data.token)
                         dispatch({ type: CURRENT_USER_UPDATED, currentUser: state.data.user})
                         dispatch(notifSend({
                             message: 'Current user update completed',
@@ -191,7 +197,7 @@ export const signUpAction = ({ firstName, lastName, email, password, confirmPass
             .then(state => {
                 switch(state.name) {
                     case FetchCode.SUCCESS: {
-                        setUserAndToken(state.data.user, state.data.token)
+                        applySessionData(state.data.user, state.data.token)
                         dispatch({ type: CURRENT_USER_LOADED, currentUser: state.data.user })
                         dispatch(push('/'))
                         return
@@ -225,7 +231,7 @@ export const signInAction = ({ email, password }) => {
         .then(state => {
             switch(state.name) {
                 case FetchCode.SUCCESS: {
-                    setUserAndToken(state.data.user, state.data.token)
+                    applySessionData(state.data.user, state.data.token)
                     dispatch({ type: CURRENT_USER_LOADED, currentUser: state.data.user })
                     dispatch(push('/'))
                     return
@@ -253,8 +259,7 @@ export const signInAction = ({ email, password }) => {
 
 export const signOutAction = () => {
     return (dispatch) => {
-        setUserAndToken(null, null)
-        removeAuthRequestToken()
+        resetSessionData()
         dispatch({ type: CURRENT_USER_LOADED, currentUser: null })
         dispatch(notifSend({
             message: 'User signed out',

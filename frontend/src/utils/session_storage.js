@@ -1,5 +1,3 @@
-import { updateAuthRequestToken } from './http_request'
-
 export const getUser = () => {
     const userString = localStorage.getItem('user')
     if (userString == null) {
@@ -31,7 +29,6 @@ export const getToken = () => {
 export const setToken = (token) => {
     if (token != null) {
         localStorage.setItem('token', token)
-        updateAuthRequestToken(token)
     } else {
         localStorage.removeItem('token')
     }
