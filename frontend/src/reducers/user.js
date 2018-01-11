@@ -33,7 +33,7 @@ export default function (state = initialState, action) {
             return { ...state, users: users, selectedUser: null }
         }
         case CURRENT_USER_LOADED: {
-            console.trace("action.currentUser:" + JSON.stringify(action.currentUser))
+            //console.trace("action.currentUser:" + JSON.stringify(action.currentUser))
             return { ...state, currentUser: action.currentUser }
         }
         case CURRENT_USER_UPDATED: {

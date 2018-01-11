@@ -9,5 +9,5 @@ type Route struct {
 
 type RouteBinding struct {
 	Keys   []string `json:"keys"`
-	Values []Route  `json:"values"`
+	Values []*Route `json:"values"`
 }

@@ -84,7 +84,15 @@ func (self *RouteController) GetNavItems() {
 	route := self.GetString("route")
 	route, err := url.PathUnescape(route)
 	if err != nil {
-		route = "/"
+		self.ServeError(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	pathname := self.GetString("pathname")
+	pathname, err = url.PathUnescape(pathname)
+	if err != nil {
+		self.ServeError(http.StatusBadRequest, err.Error())
+		return
 	}
 
 	rm := utils.GetRoleManager()
@@ -97,7 +105,7 @@ func (self *RouteController) GetNavItems() {
 
 	rc := utils.GetRouteChecker()
 	routeBindings := rc.GetRouteBindings()
-	navItems := &[]models.Route{{
+	navItems := []*models.Route{{
 		"/",
 		"Home",
 		"home",
@@ -107,13 +115,20 @@ func (self *RouteController) GetNavItems() {
 		found := false
 		for _, k := range rb.Keys {
 			if k == route {
-				navItems = &rb.Values
+				navItems = rb.Values
 				found = true
 				break
 			}
 		}
 		if found {
 			break
+		}
+	}
+
+	// Route expression is replaces by real path value (redux-little-router rules!)
+	if pathname != route {
+		for _, ni := range navItems {
+			ni.To = strings.Replace(ni.To, route, pathname, 1)
 		}
 	}
 

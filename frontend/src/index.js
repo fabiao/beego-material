@@ -21,9 +21,10 @@ WebFontLoader.load({
 
 const store = configureStore()
 const storeState = store.getState()
-const initialLocation = storeState ? storeState.router : null
-if (initialLocation) {
-    store.dispatch(initializeCurrentLocation(initialLocation))
+if (storeState) {
+    if (storeState.router) {
+        store.dispatch(initializeCurrentLocation(storeState.router))
+    }
 }
 
 if (checkUserAuthenticated()) {

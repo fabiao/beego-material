@@ -1,6 +1,7 @@
 import { FetchCode, getAuth, postAuth, putAuth } from '../utils/http_request'
 import { actions as notifActions } from 'redux-notifications'
 import { signOutAction } from '../actions/user'
+import { redirectTo } from './route';
 
 const { notifSend } = notifActions
 
@@ -29,34 +30,6 @@ let orgs = createOrgs()
 
 export const loadOrgsAction = (skip, limit) => {
     return async (dispatch) => {
-        /*
-        const currentPage = skip + 1
-        const startIndex = skip
-        const endIndex = Math.min(startIndex + limit, orgs.length)
-        const pagedRecords = orgs.slice(startIndex, endIndex)
-        const numPages = orgs.length / limit
-        let numLastPageRecords = orgs.length % limit
-        if (numLastPageRecords === 0) {
-            numLastPageRecords = limit
-        }
-        const pagination = {
-            first: "/orgs?skip=0&limit=" + limit,
-            last: "/orgs?skip=" + numPages + "&limit=" + numLastPageRecords,
-            previous: "",
-            next: "",
-            limit: currentPage < numPages ? limit : numLastPageRecords,
-            numRecords: orgs.length,
-            currentPage: currentPage
-        }
-        if (currentPage > 1) {
-            pagination.previous = "/orgs?skip=" + (currentPage - 1) + "&limit=" + limit
-        }
-        if (currentPage < numPages) {
-            pagination.next = "/orgs?skip=" + (currentPage + 1) + "&limit=" + limit
-        }
- 
-        dispatch({ type: ORGS_LOADED, orgs: pagedRecords, pagination: pagination})*/
-
         getAuth('/orgs?skip=' + skip + '&limit=' + limit)
             .then(state => {
                 switch (state.name) {
@@ -153,4 +126,9 @@ export const updateOrgAction = (org) => {
                 }
             })
     }
+}
+
+export const redirectToOrg = orgId => {
+    
+    redirectTo('/org/' + orgId)
 }

@@ -8,22 +8,44 @@ import {loadCurrentNavItemsAction} from '../actions/route'
 import 'redux-notifications/lib/styles.css'
 
 class UserNavigationDrawer extends React.PureComponent {
+    constructor(props) {
+        super(props)
+        this.state = {
+            navLinks: []
+        }
+    }
+
     componentDidMount() {
         if (this.props.authenticated) {
-            this.props.loadCurrentNavItemsAction(this.props.router.route)
+            this.props.loadCurrentNavItemsAction(this.props.router.route, this.props.router.pathname)
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.router.route !== nextProps.router.route && nextProps.authenticated) {
-            this.props.loadCurrentNavItemsAction(nextProps.router.route)
-            //const checkedRoutes = this.routeBindingsToNavItems(nextProps.routeBindings, nextProps.router.route)
-            //this.setState({ navItems: checkedRoutes })
+        if (nextProps.authenticated && this.props.router.pathname !== nextProps.router.pathname) {
+            this.props.loadCurrentNavItemsAction(nextProps.router.route, nextProps.router.pathname)
+        }
+        if (this.props.currentNavItems !== nextProps.currentNavItems) {
+            this.setState({
+                navLinks: this.toNavLinks(nextProps.currentNavItems)
+            })
         }
     }
 
+    toNavLinks = navItems => {
+        const navLinks = []
+        navItems.forEach(props => {
+            navLinks.push(<NavLink {...props} key={props.to} />)
+            if (props.isBackward) {
+                navLinks.push({divider: true})
+            }
+        })
+        return navLinks
+    }
+
     render() {
-        const { currentNavItems } = this.props
+        const { children, debugState } = this.props
+        const { navLinks } = this.state
         return (
             <NavigationDrawer
                 defaultVisible={true}
@@ -31,11 +53,11 @@ class UserNavigationDrawer extends React.PureComponent {
                 mobileDrawerType={NavigationDrawer.DrawerTypes.TEMPORARY_MINI}
                 tabletDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
                 desktopDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT}
-                navItems={currentNavItems.map(props => <NavLink {...props} key={props.to} />)}
+                navItems={navLinks}
                 toolbarActions={<AccountMenu />}
             >
-                {this.props.children}
-                <pre>{JSON.stringify(this.props.debugState, null, 4)}</pre>
+                {children}
+                <pre>{JSON.stringify(debugState, null, 4)}</pre>
                 <Notifs />
             </NavigationDrawer>
         )

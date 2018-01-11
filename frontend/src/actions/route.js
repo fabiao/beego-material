@@ -1,4 +1,5 @@
 import { FetchCode, get, getAuth } from '../utils/http_request'
+import { push } from 'redux-little-router'
 import { actions as notifActions } from 'redux-notifications'
 import { signOutAction } from './user'
 
@@ -38,9 +39,10 @@ export const loadRouteBindingsAction = () => {
     }
 }
 
-export const loadCurrentNavItemsAction = (route) => {
+export const loadCurrentNavItemsAction = (route, pathname) => {
     return async (dispatch) => {
-        getAuth('/users/nav-items', {route: encodeURIComponent(route)})
+        //alert('R:' + route + '\nP:' + pathname)
+        getAuth('/users/nav-items', {route: encodeURIComponent(route), pathname: encodeURIComponent(pathname)})
             .then(state => {
                 switch(state.name) {
                     case FetchCode.SUCCESS: {
@@ -67,4 +69,8 @@ export const loadCurrentNavItemsAction = (route) => {
                 }
             })
     }
+}
+
+export const redirectTo = (href) => dispatch => {
+    dispatch(push(href))
 }

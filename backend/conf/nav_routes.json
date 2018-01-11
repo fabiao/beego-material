@@ -1,6 +1,13 @@
 [
   {
-    "keys": ["/", "/orgs", "/users", "/activities", "/reports", "/user-settings"],
+    "keys": [
+      "/",
+      "/orgs",
+      "/users",
+      "/activities",
+      "/reports",
+      "/user-settings"
+    ],
     "values": [
       {
         "to": "/",
@@ -30,10 +37,15 @@
     ]
   },
   {
-    "keys": ["/orgs/:orgId", "/orgs/:orgId/users", "/orgs/:orgId/activities", "/orgs/:orgId/reports"],
+    "keys": [
+      "/orgs/:orgId",
+      "/orgs/:orgId/users",
+      "/orgs/:orgId/activities",
+      "/orgs/:orgId/reports"
+    ],
     "values": [
       {
-        "to": "/",
+        "to": "/orgs",
         "label": "Back",
         "icon": "keyboard_arrow_left",
         "isBackward": true

@@ -8,7 +8,12 @@ import Signup from './containers/Signup'
 import Signout from './containers/Signout'
 import UserSettings from './containers/UserSettings'
 import Organizations from './containers/Organizations'
+import OrgUsers from './containers/Organization/Users'
+import OrgActivities from './containers/Organization/Activities'
+import OrgReports from './containers/Organization/Reports'
 import Users from './containers/Users'
+import Activities from './containers/Activities'
+import Reports from './containers/Reports'
 
 let NoMatch = ({ router }) => (
     <div>
@@ -23,28 +28,6 @@ const mapStateToProps = (state) => {
 NoMatch = connect(mapStateToProps)(NoMatch)
 
 export default class App extends React.PureComponent {
-    routeBindingsToNavItems = (routeBindings) => {
-        if (routeBindings.length > 0) {
-            for (let i in routeBindings) {
-                const rb = routeBindings[i]
-                for (let j in rb.keys) {
-                    const key = rb.keys[j]
-                    const regexp = new RegExp(key)
-                    if (regexp.test(this.props.match.url)) {
-                        return rb.values
-                    }
-                }
-            }
-        }
-
-        return []
-    }
-
-    componentWillReceiveProps(nextProps) {
-        const navItems = this.routeBindingsToNavItems(nextProps.routeBindings)
-        this.setState({ navItems: navItems })
-    }
-
     render() {
         return (
             <Fragment forRoute='/'>
@@ -54,8 +37,13 @@ export default class App extends React.PureComponent {
                     <Fragment forRoute='/signin'><Signin/></Fragment>
                     <Fragment forRoute='/signout'><Signout/></Fragment>
                     <Fragment forRoute='/user-settings'><UserSettings/></Fragment>
-                    <Fragment forRoute='/orgs'><Organizations/></Fragment>
                     <Fragment forRoute='/users'><Users/></Fragment>
+                    <Fragment forRoute='/activities'><Activities/></Fragment>
+                    <Fragment forRoute='/reports'><Reports/></Fragment>
+                    <Fragment forRoute='/orgs'><Organizations/></Fragment>
+                    <Fragment forRoute='/orgs/:orgId/users'><OrgUsers/></Fragment>
+                    <Fragment forRoute='/orgs/:orgId/activities'><OrgActivities/></Fragment>
+                    <Fragment forRoute='/orgs/:orgId/reports'><OrgReports/></Fragment>
                     <Fragment forNoMatch><NoMatch/></Fragment>
                 </UserNavigationDrawer>
             </Fragment>

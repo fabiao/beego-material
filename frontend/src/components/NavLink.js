@@ -13,7 +13,7 @@ const NavLink = ({ label, to, icon, router }) => {
             component={Link}
             href={to}
             primaryText={label}
-            active={to === router.route} // router.pathname
+            active={to === router.pathname} // router.pathname
             leftIcon={leftIcon}
         />
     )

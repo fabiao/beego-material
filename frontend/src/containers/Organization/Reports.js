@@ -9,12 +9,11 @@ import {
     TableRow,
     TableColumn,
     TablePagination } from 'react-md'
-import TableActions from '../components/TableActions'
-import ActionsMenu from '../components/ActionsMenu'
-import {Auth} from '../components/Authentication'
-import EditOrgForm from '../components/EditOrgForm'
-import {loadOrgsAction, editOrgAction, updateOrgAction} from '../actions/org'
-import {redirectTo} from '../actions/route'
+import TableActions from '../../components/TableActions'
+import ActionsMenu from '../../components/ActionsMenu'
+import {Auth} from '../../components/Authentication'
+import EditOrgForm from '../../components/EditOrgForm'
+import {loadOrgsAction, editOrgAction, updateOrgAction} from '../../actions/org'
 
 class Organizations extends Auth {
     state = {
@@ -48,7 +47,7 @@ class Organizations extends Auth {
     }
 
     onInspectRecord = (record) => {
-        this.props.redirectTo('/orgs/' + record.id)
+        alert('onInspectRecord: ' + JSON.stringify(record, null, 4))
     }
 
     onCreateRecord = () => {
@@ -105,7 +104,7 @@ class Organizations extends Auth {
                                 <TableColumn>{org.address.street}</TableColumn>
                                 <TableColumn>{org.address.zipCode}</TableColumn>
                                 <TableColumn>{org.address.city}</TableColumn>
-                                <ActionsMenu record={org} caller={this} onInspectRecord={this.onInspectRecord} onEditRecord={this.onEditRecord} onDeleteRecord={this.onDeleteRecord} />
+                                <ActionsMenu record={org} onInspectRecord={this.onInspectRecord} onEditRecord={this.onEditRecord} onDeleteRecord={this.onDeleteRecord} />
                             </TableRow>
                         ))}
                     </TableBody>
@@ -131,7 +130,7 @@ class Organizations extends Auth {
 
 const mapStateToProps = (state) => {
     //alert(JSON.stringify(state.org))
-    return { selectedOrg: state.org.selectedOrg, orgs: state.org.orgs, pagination: state.org.pagination, router: state.router }
+    return { selectedOrg: state.org.selectedOrg, orgs: state.org.orgs, pagination: state.org.pagination }
 }
 
-export default connect(mapStateToProps, {loadOrgsAction, editOrgAction, updateOrgAction, redirectTo})(Organizations)
+export default connect(mapStateToProps, {loadOrgsAction, editOrgAction, updateOrgAction})(Organizations)
