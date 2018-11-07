@@ -3,9 +3,9 @@ package controllers
 import (
 	"net/http"
 	"strings"
+	response "github.com/fabiao/beego-material/backend/utils"
 
 	"github.com/astaxie/beego"
-	response "github.com/zebresel-com/beego-response"
 
 	"github.com/fabiao/beego-material/backend/models"
 )

@@ -2,3 +2,5 @@ debug
 logs/
 vendor/
 !vendor/vendor.json
+Gopkg.lock
+backend

@@ -46,7 +46,9 @@ h3,
 .md-title {
   margin-bottom: 14px; }
 
-h5, .md-subheading-1,
+
+h5,
+.md-subheading-1,
 h4,
 .md-subheading-2,
 p,
@@ -56,6 +58,7 @@ h6,
 caption,
 .md-caption {
   margin-bottom: 10px; }
+
 
 .md-display-3,
 .md-display-4,
@@ -78,19 +81,24 @@ caption,
 .md-caption {
   font-weight: 400; }
 
-h3, .md-title,
+
+h3,
+.md-title,
 h6,
 .md-body-2 {
   font-weight: 500; }
+
 
 .md-display-4 {
   font-size: 112px;
   font-weight: 300;
   line-height: 128px; }
 
+
 .md-display-3 {
   font-size: 56px;
   line-height: 84px; }
+
 
 .md-display-2 {
   font-size: 45px;
@@ -100,27 +108,41 @@ h1, .md-display-1 {
   font-size: 34px;
   line-height: 40px; }
 
-h2, .md-headline {
+
+h2,
+.md-headline {
   font-size: 24px;
   line-height: 32px; }
 
-h3, .md-title {
+
+h3,
+.md-title {
   font-size: 20px;
   line-height: 28px; }
 
-h4, .md-subheading-2 {
+
+h4,
+.md-subheading-2 {
   line-height: 28px; }
 
-h5, .md-subheading-1 {
+
+h5,
+.md-subheading-1 {
   line-height: 24px; }
 
-p, .md-body-1 {
+
+p,
+.md-body-1 {
   line-height: 20px; }
 
-h6, .md-body-2 {
+
+h6,
+.md-body-2 {
   line-height: 24px; }
 
-caption, .md-caption {
+
+caption,
+.md-caption {
   font-size: 12px; }
 
 .md-text-left, .md-picker-control {
@@ -166,7 +188,7 @@ caption, .md-caption {
   font-weight: 700; }
 
 .md-transition--sharp {
-  transition-timing-function: cubix-bezier(0.4, 0, 0.6, 1); }
+  transition-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
 
 .md-transition--standard {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
@@ -244,7 +266,7 @@ caption, .md-caption {
 *::before,
 *::after {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
 
 html {
@@ -260,7 +282,9 @@ body {
   line-height: 1.42857;
   text-rendering: optimizeLegibility; }
 
-h2, .md-headline,
+
+h2,
+.md-headline,
 h3,
 .md-title,
 h4,
@@ -273,11 +297,10 @@ p,
 .md-body-1 {
   color: rgba(0, 0, 0, 0.87); }
 
+
 .md-display-4,
 .md-display-3,
-.md-display-2,
-h1,
-.md-display-1,
+.md-display-2, h1, .md-display-1,
 caption,
 .md-caption {
   color: rgba(0, 0, 0, 0.54); }
@@ -1543,10 +1566,10 @@ tbody .md-table-row {
 
 .md-dialog--centered {
   left: 50%;
-  max-height: calc(100% - 48px);
-  max-width: calc(100% - 80px);
   top: 50%;
-  transform: translate3d(-50%, -50%, 0); }
+  transform: translate3d(-50%, -50%, 0);
+  max-height: calc(100% - 48px);
+  max-width: calc(100% - 80px); }
   .md-dialog--centered .md-list {
     padding-bottom: 8px;
     padding-top: 0; }
@@ -1912,7 +1935,7 @@ svg.md-icon {
   .md-list .md-avatar,
   .md-list .md-icon {
     flex-shrink: 0; }
-  .md-list .md-divider {
+  .md-list .md-divider:not(.md-list-item--divider-vertical) {
     margin-bottom: 8px;
     margin-top: 8px; }
   .md-list .md-list:not(.md-list--menu) {
@@ -1931,6 +1954,24 @@ svg.md-icon {
 
 .md-list-item--inset {
   padding-left: 72px; }
+
+.md-list-item--flex {
+  display: flex; }
+
+.md-list-item--button-grow {
+  flex-grow: 1; }
+
+.md-list-item--divider-vertical {
+  flex-shrink: 0;
+  height: calc(100% - 4px);
+  margin-left: 2px;
+  margin-right: 2px;
+  margin-top: 2px;
+  width: 2px; }
+
+.md-list-item--children-inline {
+  align-self: center;
+  padding-right: 2px; }
 
 .md-tile-content {
   flex-grow: 1;
@@ -2251,7 +2292,7 @@ svg.md-icon {
 
 @media (orientation: portrait) {
   .md-picker {
-    width: 320px; }
+    width: 330px; }
     .md-picker .md-picker-header {
       height: 110px; }
     .md-picker .md-time-periods {
@@ -2261,7 +2302,7 @@ svg.md-icon {
     .md-picker .md-picker-content {
       height: 340px; }
     .md-picker .md-display-3 {
-      font-size: 4.8em;
+      font-size: 5em;
       line-height: 1; }
     .md-picker .md-calendar-dows {
       padding-bottom: 12px; }
@@ -2273,22 +2314,22 @@ svg.md-icon {
         height: 36px;
         width: 36px; }
     .md-picker .md-clock-face {
-      height: 272px;
-      width: 272px; }
+      height: 282px;
+      width: 282px; }
     .md-picker .md-clock-hand {
-      width: 116px; }
+      width: 121px; }
       .md-picker .md-clock-hand--inner {
-        width: 80px; } }
+        width: 85px; } }
 
 @media (orientation: landscape) {
   .md-picker {
     display: flex;
     width: 560px; }
     .md-picker .md-picker-header {
-      width: 180px; }
+      width: 190px; }
     .md-picker .md-picker-content {
       height: 280px;
-      width: 380px; }
+      width: 370px; }
     .md-picker .md-calendar-date--btn {
       height: 35px; }
       .md-picker .md-calendar-date--btn::after {
@@ -2317,7 +2358,7 @@ svg.md-icon {
 @media (max-height: 320px) and (orientation: landscape) {
   .md-picker .md-picker-content {
     height: 256px;
-    width: calc(100vw - 196px); } }
+    width: calc(100vw - 206px); } }
 
 .md-picker--date .md-picker-control {
   display: block; }

@@ -9,7 +9,6 @@ import (
 	"github.com/astaxie/beego/context"
 	"github.com/fabiao/beego-material/backend/models"
 	"github.com/fabiao/beego-material/backend/utils"
-	response "github.com/zebresel-com/beego-response"
 )
 
 func init() {
@@ -19,11 +18,11 @@ func init() {
 		et := utils.EasyToken{}
 		isValid, userId, err := et.ValidateToken(token)
 		if err != nil {
-			response.New(ctx).CustomError(http.StatusUnauthorized, 0, err.Error())
+			utils.New(ctx).CustomError(http.StatusUnauthorized, 0, err.Error())
 			return
 		}
 		if !isValid {
-			response.New(ctx).CustomError(http.StatusUnauthorized, 0, "Invalid authorization token found")
+			utils.New(ctx).CustomError(http.StatusUnauthorized, 0, "Invalid authorization token found")
 			return
 		}
 
